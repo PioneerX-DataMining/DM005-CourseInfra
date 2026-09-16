@@ -1,13 +1,11 @@
 {
   "name": "dm005-courseinfra",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "scripts": {
     "validate": "node scripts/validate-registry.mjs",
-    "render": "node scripts/render-gateway.mjs",
-    "check": "npm run validate && npm run render && node --check middleware.js",
-    "build": "npm run check"
+    "check": "npm run validate && node --check scripts/deploy-site.mjs"
   },
   "engines": {
     "node": ">=20"

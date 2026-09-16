@@ -1,9 +1,10 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "gateway": {
     "edgeoneProject": "dm-course-gateway",
     "customDomain": "dm.pioneer-x.cn",
     "site": "china",
+    "environment": "production",
     "infraPath": "/__infra/"
   },
   "apps": [
@@ -14,18 +15,15 @@
       "repo": "PioneerX-DataMining/DM001-course-hub",
       "branch": "main",
       "mount": "/",
-      "edgeoneProject": "dm001-course-hub",
-      "origin": "https://dm001-course-hub-ee4hzmlg.edgeone.cool",
-      "deployEnabled": true,
+      "publishEnabled": true,
       "basePathReady": true,
-      "routeEnabled": true,
       "privateRepo": false,
       "build": {
         "install": "",
         "command": "",
         "output": "."
       },
-      "notes": "课程主站。已通过 EdgeOne 项目域名接入 Gateway 根路由。"
+      "notes": "课程主站，发布到 dm.pioneer-x.cn 根目录。"
     },
     {
       "id": "DM011",
@@ -34,18 +32,15 @@
       "repo": "PioneerX-DataMining/DM011-Canteen-Commons",
       "branch": "main",
       "mount": "/projects/canteen-commons/",
-      "edgeoneProject": "dm011-canteen-commons",
-      "origin": "",
-      "deployEnabled": true,
+      "publishEnabled": false,
       "basePathReady": false,
-      "routeEnabled": false,
       "privateRepo": true,
       "build": {
-        "install": "",
+        "install": "npm install",
         "command": "npm run build",
         "output": "dist"
       },
-      "notes": "当前 public/index.html 使用 /styles.css 绝对根路径；可独立部署，但修成相对资源路径前不接入统一 mount。"
+      "notes": "当前仍有 /styles.css 等根绝对路径，修复 Base Path 后再启用发布。"
     },
     {
       "id": "DM012",
@@ -54,18 +49,15 @@
       "repo": "PioneerX-DataMining/DM012-Calorie-Calculator",
       "branch": "main",
       "mount": "/projects/calorie-calculator/",
-      "edgeoneProject": "dm012-calorie-calculator",
-      "origin": "",
-      "deployEnabled": false,
+      "publishEnabled": false,
       "basePathReady": false,
-      "routeEnabled": false,
       "privateRepo": false,
       "build": {
         "install": "",
         "command": "",
         "output": "."
       },
-      "notes": "当前为空仓库，先登记，产生可发布内容后再启用部署。"
+      "notes": "当前为空仓库，产生可发布内容后再启用。"
     },
     {
       "id": "DM013",
@@ -74,18 +66,15 @@
       "repo": "PioneerX-DataMining/DM013-BioChemLearn",
       "branch": "main",
       "mount": "/projects/biochemlearn/",
-      "edgeoneProject": "dm013-biochemlearn",
-      "origin": "",
-      "deployEnabled": true,
+      "publishEnabled": true,
       "basePathReady": true,
-      "routeEnabled": false,
       "privateRepo": false,
       "build": {
         "install": "",
         "command": "",
         "output": "."
       },
-      "notes": "当前为单文件静态页面，可作为路径挂载项目。第一次部署后填写 origin 再开启路由。"
+      "notes": "单文件静态项目，直接发布到统一课程域名下的项目路径。"
     }
   ]
 }
