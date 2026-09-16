@@ -1,11 +1,11 @@
 {
   "name": "dm005-courseinfra",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "type": "module",
   "scripts": {
     "validate": "node scripts/validate-registry.mjs",
-    "check": "npm run validate && node --check scripts/deploy-site.mjs"
+    "check": "npm run validate && node --check scripts/deploy-site.mjs && node --check edge-functions/api/course-webhook.js"
   },
   "engines": {
     "node": ">=20"
