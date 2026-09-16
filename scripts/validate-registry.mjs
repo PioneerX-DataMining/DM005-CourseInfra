@@ -59,9 +59,9 @@ for (const app of registry.apps ?? []) {
   }
 
   if (app.deployEnabled && app.privateRepo) {
-    warnings.push(`${label}: private repository; central deployment needs COURSEINFRA_REPO_TOKEN`);
+    warnings.push(`${label}: private repository; normal delivery is EdgeOne Git Auto Deploy. COURSEINFRA_REPO_TOKEN is needed only for the emergency GitHub Action.`);
   }
-  if (!app.deployEnabled) warnings.push(`${label}: deployment is currently disabled`);
+  if (!app.deployEnabled) warnings.push(`${label}: publishing is currently disabled`);
 }
 
 const activeRootRoutes = (registry.apps ?? []).filter((app) => app.routeEnabled && app.mount === '/');
@@ -79,4 +79,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Registry OK: ${registry.apps.length} apps, ${registry.apps.filter((app) => app.deployEnabled).length} deployable, ${registry.apps.filter((app) => app.routeEnabled).length} routed.`);
+console.log(`Registry OK: ${registry.apps.length} apps, ${registry.apps.filter((app) => app.deployEnabled).length} publish-enabled, ${registry.apps.filter((app) => app.routeEnabled).length} routed.`);

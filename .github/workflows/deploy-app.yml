@@ -1,4 +1,4 @@
-name: Deploy registered app
+name: Emergency deploy registered app
 
 on:
   workflow_dispatch:
@@ -15,14 +15,12 @@ on:
         options:
           - production
           - preview
-  repository_dispatch:
-    types: [courseinfra-deploy]
 
 permissions:
   contents: read
 
 concurrency:
-  group: edgeone-app-${{ inputs.app_id || github.event.client_payload.app_id || 'unknown' }}
+  group: emergency-edgeone-app-${{ inputs.app_id }}
   cancel-in-progress: false
 
 jobs:
@@ -41,26 +39,9 @@ jobs:
         with:
           node-version: 20
 
-      - name: Resolve requested app
-        id: request
-        shell: bash
-        run: |
-          APP_ID="${{ inputs.app_id || github.event.client_payload.app_id }}"
-          ENVIRONMENT="${{ inputs.environment || github.event.client_payload.environment || 'production' }}"
-          if [[ -z "$APP_ID" ]]; then
-            echo "Missing app_id" >&2
-            exit 1
-          fi
-          if [[ "$ENVIRONMENT" != "production" && "$ENVIRONMENT" != "preview" ]]; then
-            echo "Invalid environment: $ENVIRONMENT" >&2
-            exit 1
-          fi
-          echo "app_id=$APP_ID" >> "$GITHUB_OUTPUT"
-          echo "environment=$ENVIRONMENT" >> "$GITHUB_OUTPUT"
-
       - name: Load app configuration
         id: app
-        run: node infra/scripts/get-app-config.mjs "${{ steps.request.outputs.app_id }}"
+        run: node infra/scripts/get-app-config.mjs "${{ inputs.app_id }}"
 
       - name: Check private repository credential
         if: steps.app.outputs.private_repo == 'true'
@@ -69,7 +50,7 @@ jobs:
         shell: bash
         run: |
           if [[ -z "$COURSEINFRA_REPO_TOKEN" ]]; then
-            echo "${{ steps.app.outputs.repo }} is private. Configure COURSEINFRA_REPO_TOKEN in CourseInfra secrets." >&2
+            echo "${{ steps.app.outputs.repo }} is private. Configure COURSEINFRA_REPO_TOKEN for emergency deployment." >&2
             exit 1
           fi
 
@@ -105,7 +86,7 @@ jobs:
         shell: bash
         run: |
           if [[ -z "$EDGEONE_API_TOKEN" ]]; then
-            echo "Configure EDGEONE_API_TOKEN in CourseInfra secrets before deploying." >&2
+            echo "Configure EDGEONE_API_TOKEN in CourseInfra secrets before emergency deployment." >&2
             exit 1
           fi
 
@@ -113,7 +94,7 @@ jobs:
         env:
           EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_API_TOKEN }}
           PROJECT_NAME: ${{ steps.app.outputs.project }}
-          TARGET_ENV: ${{ steps.request.outputs.environment }}
+          TARGET_ENV: ${{ inputs.environment }}
         shell: bash
         run: |
           edgeone makers deploy artifact \
@@ -126,12 +107,10 @@ jobs:
         shell: bash
         run: |
           {
-            echo "### CourseInfra deployment"
+            echo "### Emergency CourseInfra deployment"
+            echo "Normal production delivery uses EdgeOne Git Auto Deploy."
             echo "- App: ${{ steps.app.outputs.id }}"
             echo "- Repository: ${{ steps.app.outputs.repo }}"
             echo "- EdgeOne project: ${{ steps.app.outputs.project }}"
-            echo "- Environment: ${{ steps.request.outputs.environment }}"
-            echo "- Public mount: ${{ steps.app.outputs.mount }}"
-            echo ""
-            echo "If this is the first production deployment, copy the project's EdgeOne production domain into config/apps.json as origin before enabling Gateway routing."
+            echo "- Environment: ${{ inputs.environment }}"
           } >> "$GITHUB_STEP_SUMMARY"

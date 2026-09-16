@@ -1,119 +1,120 @@
 # DM005-CourseInfra
 
-数据挖掘课程的统一部署控制面（Control Plane）与 EdgeOne Gateway。
+数据挖掘课程的统一基础设施仓库：项目注册表（Registry）、统一域名路由（Gateway）和 Base Path 规范。
 
-## 目标
+## 正式部署架构
 
-课程项目保持“一组/一个仓库、独立开发、独立 EdgeOne Project”，但部署规则、项目登记、统一入口和路由由本仓库集中管理。
+**日常发布不经过 GitHub Actions。** 每个课程项目直接连接 EdgeOne Makers 的 Git 集成，由 EdgeOne 监听 `main` 分支并自动构建、自动部署；本仓库只维护统一入口和路由。
 
 ```text
 GitHub repositories
-  ├─ DM001-course-hub
-  ├─ DM011-Canteen-Commons
-  ├─ DM012-Calorie-Calculator
-  └─ DM013-BioChemLearn
-          │
-          ▼
-DM005-CourseInfra
-  ├─ config/apps.json       # 项目注册表 / 单一事实来源
-  ├─ GitHub Actions         # 统一构建和 EdgeOne 部署
-  └─ EdgeOne Gateway       # dm.pioneer-x.cn 的路径路由
-          │
-          ▼
-dm.pioneer-x.cn
+  ├─ DM001-course-hub ─────────────→ EdgeOne Project: dm001-course-hub
+  ├─ DM011-Canteen-Commons ────────→ EdgeOne Project: dm011-canteen-commons
+  ├─ DM012-Calorie-Calculator ─────→ EdgeOne Project: dm012-calorie-calculator
+  └─ DM013-BioChemLearn ───────────→ EdgeOne Project: dm013-biochemlearn
+                                         │
+                                         │ EdgeOne production origins
+                                         ▼
+DM005-CourseInfra ──EdgeOne Git Auto Deploy──→ dm-course-gateway
+  ├─ config/apps.json
+  ├─ scripts/validate-registry.mjs
+  ├─ scripts/render-gateway.mjs
+  └─ gateway/
+                                         │
+                                         ▼
+                                  dm.pioneer-x.cn
   ├─ /                              → DM001 Course Hub
   ├─ /projects/canteen-commons/     → DM011
+  ├─ /projects/calorie-calculator/  → DM012
   └─ /projects/biochemlearn/        → DM013
 ```
 
-## 当前原则
+## 原则
 
-1. **项目仓库不合并**：每个小组继续拥有自己的 GitHub 仓库。
-2. **每个可上线项目拥有独立 EdgeOne Project**：互不影响，可单独回滚和预览。
-3. **CourseInfra 统一管理部署参数**：仓库、分支、构建命令、产物目录、EdgeOne 项目名、挂载路径都登记在 `config/apps.json`。
-4. **统一入口只由 Gateway 占有**：`dm.pioneer-x.cn` 最终绑定 `dm-course-gateway`，Gateway 根据 URL path 重写到各项目的 EdgeOne 域名。
-5. **未满足 Base Path 要求的项目不进入统一路径**：项目可先独立部署测试，修复绝对资源路径后再开启路由。
+1. **一组 / 一个仓库**：项目代码保持独立，不合并到 CourseInfra。
+2. **一项目 / 一个 EdgeOne Project**：各项目独立部署、预览和回滚。
+3. **EdgeOne 原生 Git Auto Deploy**：`main` 更新后由 EdgeOne 直接发布，不消耗 GitHub Actions 分钟。
+4. **统一域名只属于 Gateway**：`dm.pioneer-x.cn` 绑定 `dm-course-gateway`，Gateway 按 URL path rewrite 到项目自己的 EdgeOne 生产域名。
+5. **CourseInfra 是控制面，不是 CI 执行器**：它记录项目、路径、Origin 与 Base Path 状态，并生成 Gateway Middleware。
+6. **未满足 Base Path 规范的项目不进入统一路径**。
 
 ## 注册表
 
-编辑 `config/apps.json` 即可登记新项目。核心字段：
+`config/apps.json` 是单一事实来源。核心字段：
 
 - `id`：课程项目编号，例如 `DM013`
 - `repo`：GitHub 仓库
-- `branch`：生产分支
-- `mount`：统一域名下的路径
+- `branch`：生产分支，默认 `main`
+- `mount`：在 `dm.pioneer-x.cn` 下的路径
 - `edgeoneProject`：独立 EdgeOne Makers 项目名
-- `deployEnabled`：是否允许 CourseInfra 部署
-- `basePathReady`：是否能安全挂在非根路径
+- `origin`：该项目的 EdgeOne 生产域名，例如 `https://xxxxx.edgeone.app`
+- `basePathReady`：是否能安全挂载到非根路径
 - `routeEnabled`：是否已经接入 Gateway
-- `origin`：该 EdgeOne Project 的生产域名，例如 `https://xxxxx.edgeone.app`
-- `build`：安装命令、构建命令、产物目录
+- `build`：供文档和应急部署使用的安装、构建、产物目录信息
 
-`routeEnabled=true` 时，校验器会要求 `origin` 非空；非根路径还要求 `basePathReady=true`。
+`routeEnabled=true` 时必须填写 `origin`；非根路径还必须 `basePathReady=true`。
 
-## GitHub Actions
+## 每个项目第一次接入 EdgeOne
 
-### Validate infrastructure
+每个项目只做一次：
 
-每次修改注册表、脚本或 Gateway 时自动校验配置并重新生成 Middleware，防止路径冲突或错误项目名进入主分支。
+1. EdgeOne Makers → 导入 Git 仓库。
+2. 选择对应 `PioneerX-DataMining/DMxxx-*` 仓库。
+3. Production Branch 选择 `main`。
+4. 打开 Auto Deploy。
+5. 按项目填写 Build Command / Output Directory。
+6. 第一次部署成功后，把 EdgeOne Production Domain 写入 `config/apps.json` 的 `origin`。
+7. Base Path 检查通过后，把 `routeEnabled` 设为 `true`。
 
-### Deploy registered app
+以后学生只需要正常提交并合并到 `main`，EdgeOne 会自行更新网站。
 
-在 Actions 中手动选择 `app_id`（例如 `DM001`），CourseInfra 会：
+## DM005 Gateway 在 EdgeOne 的配置
 
-1. 读取注册表；
-2. Checkout 对应项目仓库；
-3. 执行该项目自己的安装/构建命令；
-4. 清理 `.git`、`.github`、`node_modules` 等非发布内容；
-5. 使用 EdgeOne CLI 部署到注册表指定的 Makers Project。
+本仓库自身也直接连接 EdgeOne Git 集成：
 
-官方 CLI 使用方式为：
+- Git repository: `PioneerX-DataMining/DM005-CourseInfra`
+- Production branch: `main`
+- Install command: 留空
+- Build command: `npm run build`
+- Output directory: `gateway`
+- Auto Deploy: 开启
 
-```bash
-edgeone makers deploy <artifact> -n <project-name> -t <token> -e production
-```
-
-### Deploy gateway
-
-生成 `gateway/middleware.js` 后，把 `gateway/` 作为独立 EdgeOne Project `dm-course-gateway` 部署。
-
-## 一次性需要人工配置的凭据
-
-本仓库**不保存任何 Token**。在 GitHub Repository / Organization Secrets 中配置：
-
-- `EDGEONE_API_TOKEN`：EdgeOne Makers API Token，用于部署。
-- `COURSEINFRA_REPO_TOKEN`：可选。若需要从本仓库的 Action 读取其它**私有**项目仓库，提供一个只读 Contents 权限的 fine-grained GitHub token；全部是公开仓库时可不配。
-
-可选 Repository Variable：
-
-- `EDGEONE_SITE`：`china` 或 `global`，默认 `china`。
-
-## 第一次迁移 DM001 的推荐顺序
-
-1. 配置 `EDGEONE_API_TOKEN`。
-2. 运行 **Deploy registered app**，输入 `DM001`。
-3. 在 EdgeOne 控制台查看 `dm001-course-hub` 的生产域名。
-4. 把该域名填入 `config/apps.json` 的 `DM001.origin`，并把 `routeEnabled` 改为 `true`。
-5. 运行 **Deploy gateway**，先用 Gateway 的 EdgeOne 临时域名验证课程主页、Concept 页面、手机端等。
-6. 验证通过后，给 Gateway 绑定 `dm.pioneer-x.cn`，最后再切 DNS。
-
-这样迁移期间现有 GitHub Pages 不受影响。
+`npm run build` 会先校验注册表，再生成 `gateway/middleware.js` 与 `/__infra/apps.json`，并做 JavaScript 语法检查。只要 `main` 更新，Gateway 就由 EdgeOne 自己重新发布。
 
 ## Base Path 规范
 
-挂在 `/projects/<slug>/` 下的项目，浏览器看到的 URL 前缀不会消失。Gateway 会把该前缀从回源请求中剥离，因此：
+挂在 `/projects/<slug>/` 下的项目，浏览器地址会保留这个前缀。项目应优先使用相对资源路径：
 
-- 推荐：`styles.css`、`./styles.css`、相对链接；
-- 谨慎：`/styles.css`、`/assets/app.js` 这类从域名根目录开始的绝对路径。
+```html
+<link rel="stylesheet" href="./styles.css">
+<script src="./assets/app.js"></script>
+```
 
-后者会绕过项目自己的 mount，必须修改后才能把 `basePathReady` 设为 `true`。
+对于 Vite / React / Vue 等项目，应显式配置生产 `base` 为对应 mount，例如：
+
+```text
+/projects/canteen-commons/
+```
+
+避免 `/styles.css`、`/assets/app.js` 这类从域名根目录开始的绝对路径，否则会绕过项目自己的 mount。
+
+## GitHub Actions 的角色
+
+GitHub Actions **不参与日常部署**。
+
+仓库中仅保留手动应急工作流：
+
+- `Emergency deploy registered app`
+- `Emergency deploy gateway`
+
+只有 EdgeOne Git 集成故障、临时重部署或排障时才手动运行，因此正常课程使用不会持续消耗 Actions 分钟。
 
 ## Infra 观察页
 
-Gateway 部署后可访问：
+Gateway 上线后：
 
 ```text
 https://dm.pioneer-x.cn/__infra/
 ```
 
-这里仅显示公开的部署元数据与路由状态，不显示 Token 或其它秘密。
+用于查看公开的项目挂载、Base Path 和路由状态，不包含任何 Token。
