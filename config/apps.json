@@ -15,17 +15,17 @@
       "branch": "main",
       "mount": "/",
       "edgeoneProject": "dm001-course-hub",
-      "origin": "",
+      "origin": "https://dm001-course-hub-ee4hzmlg.edgeone.cool",
       "deployEnabled": true,
       "basePathReady": true,
-      "routeEnabled": false,
+      "routeEnabled": true,
       "privateRepo": false,
       "build": {
         "install": "",
         "command": "",
         "output": "."
       },
-      "notes": "课程主站。第一次部署后填写 EdgeOne 生产域名，再开启根路由。"
+      "notes": "课程主站。已通过 EdgeOne 项目域名接入 Gateway 根路由。"
     },
     {
       "id": "DM011",
