@@ -1,4 +1,4 @@
-name: Deploy gateway
+name: Emergency deploy gateway
 
 on:
   workflow_dispatch:
@@ -16,7 +16,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: edgeone-course-gateway
+  group: emergency-edgeone-course-gateway
   cancel-in-progress: false
 
 jobs:
@@ -34,7 +34,7 @@ jobs:
           node-version: 20
 
       - name: Validate and render Gateway
-        run: npm run check
+        run: npm run build
 
       - name: Install EdgeOne CLI
         run: npm install -g edgeone
@@ -45,7 +45,7 @@ jobs:
         shell: bash
         run: |
           if [[ -z "$EDGEONE_API_TOKEN" ]]; then
-            echo "Configure EDGEONE_API_TOKEN in CourseInfra secrets before deploying." >&2
+            echo "Configure EDGEONE_API_TOKEN in CourseInfra secrets before emergency deployment." >&2
             exit 1
           fi
 
@@ -65,10 +65,9 @@ jobs:
         shell: bash
         run: |
           {
-            echo "### DM Course Gateway"
+            echo "### Emergency DM Course Gateway deployment"
+            echo "Normal production delivery uses EdgeOne Git Auto Deploy from DM005-CourseInfra main."
             echo "- EdgeOne project: dm-course-gateway"
             echo "- Intended custom domain: dm.pioneer-x.cn"
             echo "- Environment: ${{ inputs.environment }}"
-            echo ""
-            echo "Validate the EdgeOne preset domain first. Bind dm.pioneer-x.cn only after the routes work as expected."
           } >> "$GITHUB_STEP_SUMMARY"
