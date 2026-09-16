@@ -1,0 +1,60 @@
+name: Deploy course site to EdgeOne
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  push:
+    branches: [main]
+    paths:
+      - 'config/apps.json'
+      - 'scripts/deploy-site.mjs'
+      - 'scripts/validate-registry.mjs'
+      - '.github/workflows/deploy-site.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dm-course-central-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout CourseInfra
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Validate registry
+        run: node scripts/validate-registry.mjs
+
+      - name: Install EdgeOne CLI
+        run: npm install -g edgeone
+
+      - name: Deploy changed course site
+        env:
+          EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_API_TOKEN }}
+          COURSEINFRA_REPO_TOKEN: ${{ secrets.COURSEINFRA_REPO_TOKEN }}
+          FORCE_DEPLOY: ${{ github.event_name != 'schedule' && 'true' || 'false' }}
+        run: node scripts/deploy-site.mjs
+
+      - name: Record successful source revisions
+        shell: bash
+        run: |
+          if git diff --quiet -- state/deployments.json; then
+            echo "Deployment state unchanged."
+            exit 0
+          fi
+          git config user.name "DM CourseInfra Bot"
+          git config user.email "courseinfra-bot@users.noreply.github.com"
+          git add state/deployments.json
+          git commit -m "chore: record deployed revisions [skip ci]"
+          git push
