@@ -1,120 +1,135 @@
 # DM005-CourseInfra
 
-数据挖掘课程的统一基础设施仓库：项目注册表（Registry）、统一域名路由（Gateway）和 Base Path 规范。
+数据挖掘课程的统一部署仓库。正式架构不再依赖 EdgeOne 的 GitHub Connector，而是由 **public 的 DM005 GitHub Actions 集中构建**，再通过 EdgeOne CLI 把完整课程站点部署到一个 EdgeOne Project。
 
-## 正式部署架构
-
-**日常发布不经过 GitHub Actions。** 每个课程项目直接连接 EdgeOne Makers 的 Git 集成，由 EdgeOne 监听 `main` 分支并自动构建、自动部署；本仓库只维护统一入口和路由。
+## 正式架构
 
 ```text
-GitHub repositories
-  ├─ DM001-course-hub ─────────────→ EdgeOne Project: dm001-course-hub
-  ├─ DM011-Canteen-Commons ────────→ EdgeOne Project: dm011-canteen-commons
-  ├─ DM012-Calorie-Calculator ─────→ EdgeOne Project: dm012-calorie-calculator
-  └─ DM013-BioChemLearn ───────────→ EdgeOne Project: dm013-biochemlearn
-                                         │
-                                         │ EdgeOne production origins
-                                         ▼
-DM005-CourseInfra ──EdgeOne Git Auto Deploy──→ dm-course-gateway
-  ├─ config/apps.json
-  ├─ scripts/validate-registry.mjs
-  ├─ scripts/render-gateway.mjs
-  └─ gateway/
-                                         │
-                                         ▼
-                                  dm.pioneer-x.cn
-  ├─ /                              → DM001 Course Hub
-  ├─ /projects/canteen-commons/     → DM011
-  ├─ /projects/calorie-calculator/  → DM012
+DM001 / DM011 / DM012 / DM013 / ...
+独立 GitHub 仓库（可以 public，也可以 private）
+                │
+                │ DM005 每 10 分钟检查是否有新 commit
+                ▼
+DM005-CourseInfra  (public)
+GitHub Actions 标准 runner
+                │
+                ├─ 拉取各项目源码
+                ├─ 按各项目自己的命令构建
+                ├─ 按 mount 拼成一个完整静态站点
+                │
+                ▼
+        EdgeOne CLI deploy
+                │
+                ▼
+EdgeOne Project: dm-course-gateway
+                │
+                ▼
+          dm.pioneer-x.cn
+  ├─ /                              → DM001
+  ├─ /projects/canteen-commons/     → DM011（启用后）
+  ├─ /projects/calorie-calculator/  → DM012（启用后）
   └─ /projects/biochemlearn/        → DM013
 ```
 
-## 原则
+EdgeOne 不需要连接任何 GitHub 仓库，也不负责构建。EdgeOne 只接收已经构建好的站点文件并负责托管、CDN 和自定义域名。
 
-1. **一组 / 一个仓库**：项目代码保持独立，不合并到 CourseInfra。
-2. **一项目 / 一个 EdgeOne Project**：各项目独立部署、预览和回滚。
-3. **EdgeOne 原生 Git Auto Deploy**：`main` 更新后由 EdgeOne 直接发布，不消耗 GitHub Actions 分钟。
-4. **统一域名只属于 Gateway**：`dm.pioneer-x.cn` 绑定 `dm-course-gateway`，Gateway 按 URL path rewrite 到项目自己的 EdgeOne 生产域名。
-5. **CourseInfra 是控制面，不是 CI 执行器**：它记录项目、路径、Origin 与 Base Path 状态，并生成 Gateway Middleware。
-6. **未满足 Base Path 规范的项目不进入统一路径**。
+## 为什么 DM005 要 public
 
-## 注册表
+标准 GitHub-hosted runner 在 public repository 中不消耗私有仓库 Actions 分钟额度。DM005 只包含部署规则、项目注册表和脚本，不保存任何明文 Token。
 
-`config/apps.json` 是单一事实来源。核心字段：
+Secrets 仍然只存在于 GitHub Actions Secrets：
 
-- `id`：课程项目编号，例如 `DM013`
+- `EDGEONE_API_TOKEN`：上传构建产物到 EdgeOne。
+- `COURSEINFRA_REPO_TOKEN`：仅当启用 private 项目发布时需要；使用 fine-grained PAT，只授予对应课程仓库 `Contents: read`。
+
+私有学生仓库本身不需要运行 GitHub Actions，因此不会因为日常 push 消耗它们的 Actions 分钟。
+
+## 自动部署
+
+`.github/workflows/deploy-site.yml` 有三种触发方式：
+
+1. 每 10 分钟自动检查一次已启用项目的生产分支；只有发现新 commit 才重新构建和部署。
+2. `config/apps.json` 或部署脚本发生变化时立即部署。
+3. 必要时可从 GitHub Actions 手动运行。
+
+每次成功部署后，DM005 会更新 `state/deployments.json`，记录各项目已经上线的 commit。下一轮没有变化时会直接跳过。
+
+当 DM005 仍为 private 时，部署 job 会直接跳过，不占用 private runner 分钟；把仓库切成 public 后自动开始工作。
+
+## 项目注册表
+
+`config/apps.json` 是单一事实来源。主要字段：
+
+- `id`：项目编号，如 `DM013`
 - `repo`：GitHub 仓库
-- `branch`：生产分支，默认 `main`
-- `mount`：在 `dm.pioneer-x.cn` 下的路径
-- `edgeoneProject`：独立 EdgeOne Makers 项目名
-- `origin`：该项目的 EdgeOne 生产域名，例如 `https://xxxxx.edgeone.app`
-- `basePathReady`：是否能安全挂载到非根路径
-- `routeEnabled`：是否已经接入 Gateway
-- `build`：供文档和应急部署使用的安装、构建、产物目录信息
+- `branch`：生产分支，通常是 `main`
+- `mount`：最终在 `dm.pioneer-x.cn` 下的目录
+- `publishEnabled`：是否纳入正式站点
+- `basePathReady`：是否已经适配非根目录部署
+- `privateRepo`：源仓库是否 private
+- `build.install`：安装命令
+- `build.command`：构建命令
+- `build.output`：最终静态文件目录
 
-`routeEnabled=true` 时必须填写 `origin`；非根路径还必须 `basePathReady=true`。
+当前：
 
-## 每个项目第一次接入 EdgeOne
-
-每个项目只做一次：
-
-1. EdgeOne Makers → 导入 Git 仓库。
-2. 选择对应 `PioneerX-DataMining/DMxxx-*` 仓库。
-3. Production Branch 选择 `main`。
-4. 打开 Auto Deploy。
-5. 按项目填写 Build Command / Output Directory。
-6. 第一次部署成功后，把 EdgeOne Production Domain 写入 `config/apps.json` 的 `origin`。
-7. Base Path 检查通过后，把 `routeEnabled` 设为 `true`。
-
-以后学生只需要正常提交并合并到 `main`，EdgeOne 会自行更新网站。
-
-## DM005 Gateway 在 EdgeOne 的配置
-
-本仓库自身也直接连接 EdgeOne Git 集成：
-
-- Git repository: `PioneerX-DataMining/DM005-CourseInfra`
-- Production branch: `main`
-- Install command: 留空
-- Build command: `npm run build`
-- Output directory: `gateway`
-- Auto Deploy: 开启
-
-`npm run build` 会先校验注册表，再生成 `gateway/middleware.js` 与 `/__infra/apps.json`，并做 JavaScript 语法检查。只要 `main` 更新，Gateway 就由 EdgeOne 自己重新发布。
+- DM001 → `/`，已启用
+- DM013 → `/projects/biochemlearn/`，已启用
+- DM011 → 暂未启用；需要先修复 `/styles.css` 等根绝对路径
+- DM012 → 暂未启用；当前没有可发布内容
 
 ## Base Path 规范
 
-挂在 `/projects/<slug>/` 下的项目，浏览器地址会保留这个前缀。项目应优先使用相对资源路径：
+挂在 `/projects/<slug>/` 下的项目必须适配该路径。静态项目优先使用相对路径：
 
 ```html
 <link rel="stylesheet" href="./styles.css">
 <script src="./assets/app.js"></script>
 ```
 
-对于 Vite / React / Vue 等项目，应显式配置生产 `base` 为对应 mount，例如：
+Vite / React / Vue 项目应配置对应的生产 base，例如：
 
 ```text
 /projects/canteen-commons/
 ```
 
-避免 `/styles.css`、`/assets/app.js` 这类从域名根目录开始的绝对路径，否则会绕过项目自己的 mount。
+不要直接使用 `/styles.css`、`/assets/app.js` 这类从域名根目录开始的资源路径。
 
-## GitHub Actions 的角色
+## EdgeOne
 
-GitHub Actions **不参与日常部署**。
-
-仓库中仅保留手动应急工作流：
-
-- `Emergency deploy registered app`
-- `Emergency deploy gateway`
-
-只有 EdgeOne Git 集成故障、临时重部署或排障时才手动运行，因此正常课程使用不会持续消耗 Actions 分钟。
-
-## Infra 观察页
-
-Gateway 上线后：
+整个课程网站只需要一个 EdgeOne Makers Project：
 
 ```text
-https://dm.pioneer-x.cn/__infra/
+dm-course-gateway
 ```
 
-用于查看公开的项目挂载、Base Path 和路由状态，不包含任何 Token。
+GitHub Actions 使用：
+
+```bash
+edgeone makers deploy <assembled-site> \
+  -n dm-course-gateway \
+  -t "$EDGEONE_API_TOKEN" \
+  -e production \
+  --site china
+```
+
+如果项目不存在，CLI 可在首次部署时创建。EdgeOne 不需要绑定 GitHub 仓库。
+
+最终只把自定义域名：
+
+```text
+dm.pioneer-x.cn
+```
+
+绑定到 `dm-course-gateway`。
+
+## Infra 状态页
+
+每次构建都会在成品站点中生成：
+
+```text
+/__infra/
+/__infra/apps.json
+```
+
+用于查看当前上线的项目、路径和 commit，不包含任何 Secret。
