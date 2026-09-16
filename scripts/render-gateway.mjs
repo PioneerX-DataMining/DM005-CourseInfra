@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 
 const registryPath = new URL('../config/apps.json', import.meta.url);
+const middlewarePath = new URL('../middleware.js', import.meta.url);
 const gatewayDir = new URL('../gateway/', import.meta.url);
 const infraDir = new URL('../gateway/__infra/', import.meta.url);
 const registry = JSON.parse(await readFile(registryPath, 'utf8'));
@@ -39,7 +40,7 @@ const publicStatus = {
 
 await mkdir(gatewayDir, { recursive: true });
 await mkdir(infraDir, { recursive: true });
-await writeFile(new URL('./middleware.js', gatewayDir), middleware);
+await writeFile(middlewarePath, middleware);
 await writeFile(new URL('./apps.json', infraDir), JSON.stringify(publicStatus, null, 2) + '\n');
 
-console.log(`Rendered Gateway with ${routes.length} active route(s).`);
+console.log(`Rendered root middleware with ${routes.length} active route(s).`);
