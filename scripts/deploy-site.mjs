@@ -140,12 +140,25 @@ for (const app of orderedApps) {
   await copyDirectoryContents(artifactDir, targetDir);
 }
 
+// Makers Functions must be included in the manually built deployment directory.
+const edgeFunctionsSource = path.join(repoRoot, 'edge-functions');
+const edgeFunctionsInfo = await stat(edgeFunctionsSource).catch(() => null);
+if (edgeFunctionsInfo?.isDirectory()) {
+  await cp(edgeFunctionsSource, path.join(siteDir, 'edge-functions'), { recursive: true });
+  await writeFile(
+    path.join(siteDir, 'package.json'),
+    JSON.stringify({ name: 'dm-course-gateway', private: true, type: 'module' }, null, 2) + '\n'
+  );
+  console.log('Bundled EdgeOne webhook receiver at /api/course-webhook.');
+}
+
 const infraDir = path.join(siteDir, '__infra');
 await mkdir(infraDir, { recursive: true });
 const publicStatus = {
   generatedAt: new Date().toISOString(),
   domain: registry.gateway.customDomain,
   edgeoneProject: registry.gateway.edgeoneProject,
+  webhookPath: '/api/course-webhook',
   apps: orderedApps.map((app) => ({
     id: app.id,
     name: app.name,
@@ -155,7 +168,7 @@ const publicStatus = {
   }))
 };
 await writeFile(path.join(infraDir, 'apps.json'), JSON.stringify(publicStatus, null, 2) + '\n');
-await writeFile(path.join(infraDir, 'index.html'), `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DM CourseInfra</title><style>body{font-family:system-ui,sans-serif;max-width:900px;margin:40px auto;padding:0 20px;line-height:1.6}code{background:#f3f4f6;padding:2px 6px;border-radius:5px}li{margin:8px 0}</style><h1>DM CourseInfra</h1><p>统一课程站点由 DM005 集中构建并部署到 EdgeOne。</p><ul>${orderedApps.map((app) => `<li><strong>${app.id}</strong> ${app.name} → <code>${app.mount}</code> · ${latest[app.id].slice(0, 12)}</li>`).join('')}</ul></html>`);
+await writeFile(path.join(infraDir, 'index.html'), `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DM CourseInfra</title><style>body{font-family:system-ui,sans-serif;max-width:900px;margin:40px auto;padding:0 20px;line-height:1.6}code{background:#f3f4f6;padding:2px 6px;border-radius:5px}li{margin:8px 0}</style><h1>DM CourseInfra</h1><p>统一课程站点由 DM005 集中构建并部署到 EdgeOne。</p><p>Webhook: <code>/api/course-webhook</code></p><ul>${orderedApps.map((app) => `<li><strong>${app.id}</strong> ${app.name} → <code>${app.mount}</code> · ${latest[app.id].slice(0, 12)}</li>`).join('')}</ul></html>`);
 
 console.log(`\nDeploying assembled site to EdgeOne project ${registry.gateway.edgeoneProject}...`);
 await runProcess('edgeone', [
