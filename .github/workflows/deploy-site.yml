@@ -1,12 +1,15 @@
 name: Deploy course site to EdgeOne
 
 on:
+  repository_dispatch:
+    types: [course-source-push]
   schedule:
-    - cron: '*/10 * * * *'
+    - cron: '17 */6 * * *'
   push:
     branches: [main]
     paths:
       - 'config/apps.json'
+      - 'edge-functions/**'
       - 'scripts/deploy-site.mjs'
       - 'scripts/validate-registry.mjs'
       - '.github/workflows/deploy-site.yml'
@@ -44,8 +47,14 @@ jobs:
         env:
           EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_API_TOKEN }}
           COURSEINFRA_REPO_TOKEN: ${{ secrets.COURSEINFRA_REPO_TOKEN }}
-          FORCE_DEPLOY: ${{ github.event_name != 'schedule' && 'true' || 'false' }}
-        run: node scripts/deploy-site.mjs
+          FORCE_DEPLOY: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && 'true' || 'false' }}
+          TRIGGER_REPOSITORY: ${{ github.event.client_payload.repository || '' }}
+          TRIGGER_REVISION: ${{ github.event.client_payload.after || '' }}
+        run: |
+          if [[ -n "$TRIGGER_REPOSITORY" ]]; then
+            echo "Webhook trigger: $TRIGGER_REPOSITORY ${TRIGGER_REVISION:0:12}"
+          fi
+          node scripts/deploy-site.mjs
 
       - name: Record successful source revisions
         shell: bash
