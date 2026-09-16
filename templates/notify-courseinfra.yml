@@ -16,20 +16,32 @@ jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
+      - name: Check dispatch credential
+        id: auth
+        env:
+          COURSEINFRA_DISPATCH_TOKEN: ${{ secrets.COURSEINFRA_DISPATCH_TOKEN }}
+        shell: bash
+        run: |
+          if [[ -n "$COURSEINFRA_DISPATCH_TOKEN" ]]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::COURSEINFRA_DISPATCH_TOKEN is not configured yet; automatic deployment notification is skipped."
+          fi
+
       - name: Trigger central deployment
+        if: steps.auth.outputs.configured == 'true'
         env:
           GH_TOKEN: ${{ secrets.COURSEINFRA_DISPATCH_TOKEN }}
           APP_ID: DMXXX
         shell: bash
         run: |
-          if [[ -z "$GH_TOKEN" ]]; then
-            echo "COURSEINFRA_DISPATCH_TOKEN is not configured." >&2
-            exit 1
-          fi
           gh api \
             --method POST \
             -H "Accept: application/vnd.github+json" \
             /repos/PioneerX-DataMining/DM005-CourseInfra/dispatches \
             -f event_type='courseinfra-deploy' \
             -F client_payload[app_id]="$APP_ID" \
-            -F client_payload[environment]='production'
+            -F client_payload[environment]='production' \
+            -F client_payload[source_repo]="$GITHUB_REPOSITORY" \
+            -F client_payload[source_sha]="$GITHUB_SHA"
