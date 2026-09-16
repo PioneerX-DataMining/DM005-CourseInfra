@@ -49,6 +49,7 @@ async function downloadSource(app, destination) {
   const url = `https://api.github.com/repos/${app.repo}/tarball/${encodeURIComponent(app.branch)}`;
   const response = await fetch(url, { headers: githubHeaders(app), redirect: 'follow' });
   if (!response.ok) throw new Error(`${app.id}: unable to download source: HTTP ${response.status}`);
+  await mkdir(path.dirname(tarPath), { recursive: true });
   await writeFile(tarPath, Buffer.from(await response.arrayBuffer()));
   await rm(destination, { recursive: true, force: true });
   await mkdir(destination, { recursive: true });
