@@ -31,9 +31,9 @@ EdgeOne Project: dm-course-gateway
                 ▼
           dm.pioneer-x.cn
   ├─ /                              → DM001
-  ├─ /projects/canteen-commons/     → DM011（启用后）
-  ├─ /projects/calorie-calculator/  → DM012（启用后）
-  └─ /projects/biochemlearn/        → DM013
+  ├─ /projects/dm011/               → DM011（private，配置读取 Token 后启用）
+  ├─ /projects/dm012/               → DM012
+  └─ /projects/dm013/               → DM013
 ```
 
 EdgeOne 不需要连接任何 GitHub 仓库，也不负责项目源码构建。它负责 Webhook 接收、成品托管、CDN 和自定义域名。
@@ -97,18 +97,18 @@ Active: enabled
 - `build.command`：构建命令
 - `build.output`：最终静态文件目录
 
-当前：DM001 发布到 `/`；DM013 发布到 `/projects/biochemlearn/`；DM011 需要先修复根绝对资源路径后再启用；DM012 当前没有可发布内容。
+当前：DM001 发布到 `/`；DM012 发布到 `/projects/dm012/`；DM013 发布到 `/projects/dm013/`；DM011 已重置为占位页，但仓库为 private，配置 `COURSEINFRA_REPO_TOKEN` 后即可启用。
 
 ## Base Path 规范
 
-挂在 `/projects/<slug>/` 下的项目必须适配该路径。静态项目优先使用相对路径：
+学生项目统一使用编号路径 `/projects/dmNNN/`，项目必须适配自己的子目录。静态项目优先使用相对路径：
 
 ```html
 <link rel="stylesheet" href="./styles.css">
 <script src="./assets/app.js"></script>
 ```
 
-Vite / React / Vue 项目应配置对应的生产 base，例如 `/projects/canteen-commons/`。不要直接使用 `/styles.css`、`/assets/app.js` 这类从域名根目录开始的资源路径。
+Vite / React / Vue 项目应配置对应的生产 base，例如 DM011 使用 `/projects/dm011/`。不要直接使用 `/styles.css`、`/assets/app.js` 这类从域名根目录开始的资源路径。
 
 ## EdgeOne
 
