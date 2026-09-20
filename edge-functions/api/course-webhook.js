@@ -2,6 +2,7 @@ const DISPATCH_URL = 'https://api.github.com/repos/PioneerX-DataMining/DM005-Cou
 const COURSE_ORG = 'PioneerX-DataMining';
 const INFRA_REPO = 'PioneerX-DataMining/DM005-CourseInfra';
 const PRODUCTION_REF = 'refs/heads/main';
+// Runtime secrets are supplied by the dm-course-gateway Production environment.
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
