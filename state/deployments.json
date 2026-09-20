@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "gatewayProject": "dm-course-gateway",
-  "lastSuccessfulDeployment": "2026-09-20T12:21:20.045Z",
+  "lastSuccessfulDeployment": "2026-09-20T12:39:56.556Z",
   "apps": {
     "DM001": {
       "repo": "PioneerX-DataMining/DM001-course-hub",
@@ -9,11 +9,23 @@
       "sha": "a8ad3f4688ce7f0a1637d3b93529445b74274065",
       "mount": "/"
     },
+    "DM011": {
+      "repo": "PioneerX-DataMining/DM011-Canteen-Commons",
+      "branch": "main",
+      "sha": "0b3ddd1987d47104d7f08d992d63e71081a77134",
+      "mount": "/projects/dm011/"
+    },
+    "DM012": {
+      "repo": "PioneerX-DataMining/DM012-Calorie-Calculator",
+      "branch": "main",
+      "sha": "e00528a323b8c9374f45b2b30c06b58195c2f8d7",
+      "mount": "/projects/dm012/"
+    },
     "DM013": {
       "repo": "PioneerX-DataMining/DM013-BioChemLearn",
       "branch": "main",
-      "sha": "23a8980ab24bc454310dd8c22c53f9db30fe3e1f",
-      "mount": "/projects/biochemlearn/"
+      "sha": "88bc44e4d39ff923bc0e6a2a6dd396dfa36983d8",
+      "mount": "/projects/dm013/"
     }
   }
 }
