@@ -17,13 +17,13 @@
       "mount": "/",
       "publishEnabled": true,
       "basePathReady": true,
-      "privateRepo": false,
+      "privateRepo": true,
       "build": {
         "install": "",
         "command": "",
         "output": "."
       },
-      "notes": "课程主站，发布到 dm.pioneer-x.cn 根目录。"
+      "notes": "课程主站；建议仓库设为 private，由 CourseInfra 读取并发布到 dm.pioneer-x.cn 根目录。"
     },
     {
       "id": "DM011",
@@ -32,7 +32,7 @@
       "repo": "PioneerX-DataMining/DM011-Canteen-Commons",
       "branch": "main",
       "mount": "/projects/dm011/",
-      "publishEnabled": false,
+      "publishEnabled": true,
       "basePathReady": true,
       "privateRepo": true,
       "build": {
@@ -40,7 +40,7 @@
         "command": "",
         "output": "."
       },
-      "notes": "已重置为静态占位页。仓库为 private；配置 COURSEINFRA_REPO_TOKEN 后即可启用自动发布。"
+      "notes": "课程项目占位页；学生同步代码到 main 后由 CourseInfra 自动发布。"
     },
     {
       "id": "DM012",
@@ -51,7 +51,7 @@
       "mount": "/projects/dm012/",
       "publishEnabled": true,
       "basePathReady": true,
-      "privateRepo": false,
+      "privateRepo": true,
       "build": {
         "install": "",
         "command": "",
@@ -68,7 +68,7 @@
       "mount": "/projects/dm013/",
       "publishEnabled": true,
       "basePathReady": true,
-      "privateRepo": false,
+      "privateRepo": true,
       "build": {
         "install": "",
         "command": "",
