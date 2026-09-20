@@ -28,44 +28,27 @@
     {
       "id": "DM011",
       "name": "Canteen Commons",
-      "slug": "canteen-commons",
+      "slug": "dm011",
       "repo": "PioneerX-DataMining/DM011-Canteen-Commons",
       "branch": "main",
-      "mount": "/projects/canteen-commons/",
+      "mount": "/projects/dm011/",
       "publishEnabled": false,
-      "basePathReady": false,
+      "basePathReady": true,
       "privateRepo": true,
-      "build": {
-        "install": "npm install",
-        "command": "npm run build",
-        "output": "dist"
-      },
-      "notes": "当前仍有 /styles.css 等根绝对路径，修复 Base Path 后再启用发布。"
-    },
-    {
-      "id": "DM012",
-      "name": "Calorie Calculator",
-      "slug": "calorie-calculator",
-      "repo": "PioneerX-DataMining/DM012-Calorie-Calculator",
-      "branch": "main",
-      "mount": "/projects/calorie-calculator/",
-      "publishEnabled": false,
-      "basePathReady": false,
-      "privateRepo": false,
       "build": {
         "install": "",
         "command": "",
         "output": "."
       },
-      "notes": "当前为空仓库，产生可发布内容后再启用。"
+      "notes": "已重置为静态占位页。仓库为 private；配置 COURSEINFRA_REPO_TOKEN 后即可启用自动发布。"
     },
     {
-      "id": "DM013",
-      "name": "BioChem Learn",
-      "slug": "biochemlearn",
-      "repo": "PioneerX-DataMining/DM013-BioChemLearn",
+      "id": "DM012",
+      "name": "Calorie Calculator",
+      "slug": "dm012",
+      "repo": "PioneerX-DataMining/DM012-Calorie-Calculator",
       "branch": "main",
-      "mount": "/projects/biochemlearn/",
+      "mount": "/projects/dm012/",
       "publishEnabled": true,
       "basePathReady": true,
       "privateRepo": false,
@@ -74,7 +57,24 @@
         "command": "",
         "output": "."
       },
-      "notes": "单文件静态项目，直接发布到统一课程域名下的项目路径。"
+      "notes": "课程项目占位页；学生同步代码到 main 后由 CourseInfra 自动发布。"
+    },
+    {
+      "id": "DM013",
+      "name": "BioChem Learn",
+      "slug": "dm013",
+      "repo": "PioneerX-DataMining/DM013-BioChemLearn",
+      "branch": "main",
+      "mount": "/projects/dm013/",
+      "publishEnabled": true,
+      "basePathReady": true,
+      "privateRepo": false,
+      "build": {
+        "install": "",
+        "command": "",
+        "output": "."
+      },
+      "notes": "课程项目占位页；学生同步代码到 main 后由 CourseInfra 自动发布。"
     }
   ]
 }
