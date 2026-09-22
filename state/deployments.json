@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "gatewayProject": "dm-course-gateway",
-  "lastSuccessfulDeployment": "2026-09-22T02:46:10.199Z",
+  "lastSuccessfulDeployment": "2026-09-22T02:52:30.554Z",
   "apps": {
     "DM001": {
       "repo": "PioneerX-DataMining/DM001-course-hub",
       "branch": "main",
-      "sha": "48823e4d9c95ab8080a5177f8583e076e3b42cc7",
+      "sha": "8a1901577afee40658870c8f7d7554d582dad692",
       "mount": "/"
     },
     "DM011": {
