@@ -26,15 +26,16 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout CourseInfra
+      - name: Checkout latest CourseInfra main
         uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 1
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Validate registry
         run: node scripts/validate-registry.mjs
@@ -58,6 +59,7 @@ jobs:
           done
 
       - name: Deploy changed course site
+        shell: bash
         env:
           EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_API_TOKEN }}
           COURSEINFRA_REPO_TOKEN: ${{ secrets.COURSEINFRA_REPO_TOKEN }}
@@ -68,7 +70,22 @@ jobs:
           if [[ -n "$TRIGGER_REPOSITORY" ]]; then
             echo "Webhook trigger: $TRIGGER_REPOSITORY ${TRIGGER_REVISION:0:12}"
           fi
-          node scripts/deploy-site.mjs
+
+          for attempt in 1 2 3; do
+            echo "Deploy attempt $attempt/3..."
+            if node scripts/deploy-site.mjs; then
+              exit 0
+            fi
+
+            if [[ "$attempt" -eq 3 ]]; then
+              echo "EdgeOne deployment failed after 3 attempts."
+              exit 1
+            fi
+
+            wait_seconds=$((attempt * 10))
+            echo "Transient deployment failure; retrying in ${wait_seconds}s..."
+            sleep "$wait_seconds"
+          done
 
       - name: Record successful source revisions
         shell: bash
@@ -77,8 +94,25 @@ jobs:
             echo "Deployment state unchanged."
             exit 0
           fi
+
+          # Preserve the state produced by the deployment, then move the
+          # working tree onto the latest main before committing it. This
+          # avoids non-fast-forward failures when queued runs started from
+          # an older event SHA.
+          state_tmp="$(mktemp)"
+          cp state/deployments.json "$state_tmp"
+          git fetch origin main
+          git reset --hard origin/main
+          cp "$state_tmp" state/deployments.json
+          rm -f "$state_tmp"
+
+          if git diff --quiet -- state/deployments.json; then
+            echo "Latest main already records this deployment state."
+            exit 0
+          fi
+
           git config user.name "DM CourseInfra Bot"
           git config user.email "courseinfra-bot@users.noreply.github.com"
           git add state/deployments.json
           git commit -m "chore: record deployed revisions [skip ci]"
-          git push
+          git push origin HEAD:main
