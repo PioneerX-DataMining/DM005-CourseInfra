@@ -1,6 +1,6 @@
 # DM005-CourseInfra
 
-数据挖掘课程的统一部署仓库。正式架构不依赖 EdgeOne 的 GitHub Connector，而是由 **public 的 DM005 GitHub Actions 集中构建**，再通过 EdgeOne CLI 把完整课程站点部署到一个 EdgeOne Makers Project。
+数据挖掘课程的统一部署仓库。正式架构不依赖 EdgeOne 的 GitHub Connector，而是由 **public 的 DM005 GitHub Actions 集中构建**，再通过 EdgeOne Makers SDK 把完整课程站点部署到一个 EdgeOne Makers Project。
 
 ## 正式架构
 
@@ -23,7 +23,7 @@ GitHub Actions 标准 runner
                 ├─ 按 mount 拼成一个完整站点
                 │
                 ▼
-        EdgeOne CLI deploy
+     EdgeOne Makers SDK deploy
                 │
                 ▼
 EdgeOne Project: dm-course-gateway
@@ -126,17 +126,18 @@ Vite / React / Vue 项目应配置对应的生产 base，例如 DM011 使用 `/p
 
 ## EdgeOne
 
-整个课程网站只需要一个 EdgeOne Makers Project：`dm-course-gateway`。GitHub Actions 使用 CLI 直接上传已经组装好的目录：
+整个课程网站只需要一个 EdgeOne Makers Project：`dm-course-gateway`。CourseInfra 使用官方 `@edgeone/makers-sdk` 发布已经组装好的完整站点目录，并固定使用该项目的 `projectId`。
 
-```bash
-edgeone makers deploy <assembled-site> \
-  -n dm-course-gateway \
-  -t "$EDGEONE_API_TOKEN" \
-  -e production \
-  --site china
-```
+发布过程分成两个阶段：
 
-手工构建目录中同时包含 `edge-functions/`，因此 Webhook Receiver 会和课程站点一起发布。EdgeOne 官方支持在直接上传产物中携带 Makers Functions。
+1. `deployments.deploy` 上传制品并返回唯一的 `deploymentId`；
+2. `deployments.wait` 只轮询这个 `deploymentId`，直到进入 `Success / Failed / Timeout / Cancelled / Invalid` 之一。
+
+只有明确的 `UploadError`（制品上传阶段、尚未创建 deployment）会安全重试一次。已经取得 `deploymentId` 后，无论本地等待超时还是网络异常，都不会在同一次 Action 中再次创建生产部署。
+
+如果 GitHub 侧状态落后，但上一次远端部署后来实际上成功，下一次 reconciliation 会先读取线上 `/__infra/apps.json`。若线上各项目 revision 已经等于所有仓库当前最新 SHA，只修复 `state/deployments.json`，不再重复发布。
+
+手工构建目录中同时包含 `edge-functions/`，因此 Webhook Receiver 会和课程站点一起发布。
 
 最终只把 `dm.pioneer-x.cn` 绑定到 `dm-course-gateway`。
 
