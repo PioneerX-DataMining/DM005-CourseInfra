@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "gatewayProject": "dm-course-gateway",
-  "lastSuccessfulDeployment": "2026-09-23T02:19:09.727Z",
+  "lastSuccessfulDeployment": "2026-09-23T02:22:20.644Z",
   "apps": {
     "DM001": {
       "repo": "PioneerX-DataMining/DM001-course-hub",
@@ -32,6 +32,12 @@
       "branch": "main",
       "sha": "2ef8b32f4fc35d2160586300407a00352ea8c3c0",
       "mount": "/projects/dm014/"
+    },
+    "DM015": {
+      "repo": "PioneerX-DataMining/DM015-Brain-Smash",
+      "branch": "main",
+      "sha": "3724ae05c4af8bb0e695ffa9b9ed9f1cdffb21a4",
+      "mount": "/projects/dm015/"
     }
   }
 }
