@@ -20,7 +20,7 @@ permissions:
 
 concurrency:
   group: dm-course-central-deploy
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   deploy:
@@ -73,7 +73,7 @@ jobs:
 
           for attempt in 1 2 3; do
             echo "Deploy attempt $attempt/3..."
-            if node scripts/deploy-site.mjs; then
+            if timeout --kill-after=30s 5m node scripts/deploy-site.mjs; then
               exit 0
             fi
 
