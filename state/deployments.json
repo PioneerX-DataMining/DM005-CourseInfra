@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "gatewayProject": "dm-course-gateway",
-  "lastSuccessfulDeployment": "2026-09-23T02:43:33.724Z",
+  "lastSuccessfulDeployment": "2026-09-23T02:52:55.005Z",
   "apps": {
     "DM001": {
       "repo": "PioneerX-DataMining/DM001-course-hub",
@@ -44,6 +44,12 @@
       "branch": "main",
       "sha": "c8991c73cbc34c2f3eef9f0eb786634fdf261daf",
       "mount": "/projects/dm016/"
+    },
+    "DM017": {
+      "repo": "PioneerX-DataMining/DM017-DreamComeTrue",
+      "branch": "main",
+      "sha": "bff9c962809bda650d6222a09e2bae72f06bbca2",
+      "mount": "/projects/dm017/"
     }
   }
 }
