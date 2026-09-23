@@ -41,23 +41,8 @@ jobs:
       - name: Validate registry
         run: node scripts/validate-registry.mjs
 
-      - name: Install EdgeOne CLI
-        shell: bash
-        run: |
-          set -e
-          for attempt in 1 2 3; do
-            echo "Installing EdgeOne CLI (attempt $attempt/3)..."
-            if npm install -g edgeone; then
-              edgeone --version || true
-              exit 0
-            fi
-            if [[ "$attempt" -eq 3 ]]; then
-              echo "EdgeOne CLI installation failed after 3 attempts."
-              exit 1
-            fi
-            npm uninstall -g edgeone || true
-            sleep $((attempt * 3))
-          done
+      - name: Install CourseInfra dependencies
+        run: npm install --no-audit --no-fund
 
       - name: Deploy latest course state
         shell: bash
