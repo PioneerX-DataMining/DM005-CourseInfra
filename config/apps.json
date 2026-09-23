@@ -5,7 +5,8 @@
     "customDomain": "dm.pioneer-x.cn",
     "site": "china",
     "environment": "production",
-    "infraPath": "/__infra/"
+    "infraPath": "/__infra/",
+    "projectId": "makers-ssul1zh8kx7t"
   },
   "apps": [
     {
