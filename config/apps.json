@@ -126,6 +126,23 @@
         "output": "."
       },
       "notes": "课程项目占位页；学生同步代码到 main 后由 CourseInfra 自动发布。"
+    },
+    {
+      "id": "DM017",
+      "name": "DreamComeTrue",
+      "slug": "dm017",
+      "repo": "PioneerX-DataMining/DM017-DreamComeTrue",
+      "branch": "main",
+      "mount": "/projects/dm017/",
+      "publishEnabled": true,
+      "basePathReady": true,
+      "privateRepo": true,
+      "build": {
+        "install": "",
+        "command": "",
+        "output": "."
+      },
+      "notes": "课程项目占位页；学生同步代码到 main 后由 CourseInfra 自动发布。"
     }
   ]
 }
