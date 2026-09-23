@@ -4,7 +4,7 @@ on:
   repository_dispatch:
     types: [course-source-push]
   schedule:
-    - cron: '17 */6 * * *'
+    - cron: '*/30 * * * *'
   push:
     branches: [main]
     paths:
@@ -19,12 +19,13 @@ permissions:
   contents: write
 
 concurrency:
-  group: dm-course-central-deploy-v3
-  cancel-in-progress: true
+  group: dm-course-central-deploy
+  cancel-in-progress: false
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout latest CourseInfra main
         uses: actions/checkout@v4
@@ -58,7 +59,7 @@ jobs:
             sleep $((attempt * 3))
           done
 
-      - name: Deploy changed course site
+      - name: Deploy latest course state
         shell: bash
         env:
           EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_API_TOKEN }}
@@ -71,21 +72,10 @@ jobs:
             echo "Webhook trigger: $TRIGGER_REPOSITORY ${TRIGGER_REVISION:0:12}"
           fi
 
-          for attempt in 1 2 3; do
-            echo "Deploy attempt $attempt/3..."
-            if timeout --kill-after=30s 5m node scripts/deploy-site.mjs; then
-              exit 0
-            fi
-
-            if [[ "$attempt" -eq 3 ]]; then
-              echo "EdgeOne deployment failed after 3 attempts."
-              exit 1
-            fi
-
-            wait_seconds=$((attempt * 10))
-            echo "Transient deployment failure; retrying in ${wait_seconds}s..."
-            sleep "$wait_seconds"
-          done
+          # Important: do not retry the deploy command here. A local timeout or
+          # transport failure does not prove the remote EdgeOne deployment stopped;
+          # blindly retrying can create overlapping production deployments.
+          timeout --kill-after=30s 12m node scripts/deploy-site.mjs
 
       - name: Record successful source revisions
         shell: bash
