@@ -155,21 +155,43 @@ if (edgeFunctionsInfo?.isDirectory()) {
 
 const infraDir = path.join(siteDir, '__infra');
 await mkdir(infraDir, { recursive: true });
+const generatedAt = new Date().toISOString();
+const triggerInfo = {
+  repository: process.env.TRIGGER_REPOSITORY || null,
+  revision: process.env.TRIGGER_REVISION ? process.env.TRIGGER_REVISION.slice(0, 12) : null,
+  forceDeploy
+};
 const publicStatus = {
-  generatedAt: new Date().toISOString(),
+  generatedAt,
+  lastSuccessfulDeployment: previousState.lastSuccessfulDeployment || null,
   domain: registry.gateway.customDomain,
   edgeoneProject: registry.gateway.edgeoneProject,
   webhookPath: '/api/course-webhook',
-  apps: orderedApps.map((app) => ({
-    id: app.id,
-    name: app.name,
-    repo: app.repo,
-    mount: app.mount,
-    revision: latest[app.id].slice(0, 12)
-  }))
+  deploymentPolicy: {
+    mode: 'single-flight-latest-state',
+    selfHealSchedule: 'every 30 minutes',
+    note: 'One production deployment runs at a time; concurrent pushes collapse into the latest pending deployment.'
+  },
+  trigger: triggerInfo,
+  changedApps: changedApps.map((app) => app.id),
+  apps: orderedApps.map((app) => {
+    const previousRevision = previousState.apps?.[app.id]?.sha || null;
+    return {
+      id: app.id,
+      name: app.name,
+      repo: app.repo,
+      mount: app.mount,
+      revision: latest[app.id].slice(0, 12),
+      previousRevision: previousRevision ? previousRevision.slice(0, 12) : null,
+      changed: previousRevision !== latest[app.id]
+    };
+  })
 };
 await writeFile(path.join(infraDir, 'apps.json'), JSON.stringify(publicStatus, null, 2) + '\n');
-await writeFile(path.join(infraDir, 'index.html'), `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DM CourseInfra</title><style>body{font-family:system-ui,sans-serif;max-width:900px;margin:40px auto;padding:0 20px;line-height:1.6}code{background:#f3f4f6;padding:2px 6px;border-radius:5px}li{margin:8px 0}</style><h1>DM CourseInfra</h1><p>统一课程站点由 DM005 集中构建并部署到 EdgeOne。</p><p>Webhook: <code>/api/course-webhook</code></p><ul>${orderedApps.map((app) => `<li><strong>${app.id}</strong> ${app.name} → <code>${app.mount}</code> · ${latest[app.id].slice(0, 12)}</li>`).join('')}</ul></html>`);
+
+const changedLabel = changedApps.length ? changedApps.map((app) => app.id).join(', ') : '无（强制部署 / 基础设施变更）';
+const rows = publicStatus.apps.map((app) => `<tr><td><strong>${app.id}</strong><br><span>${app.name}</span></td><td><code>${app.mount}</code></td><td><code>${app.revision}</code></td><td>${app.changed ? '更新' : '未变'}</td></tr>`).join('');
+await writeFile(path.join(infraDir, 'index.html'), `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DM CourseInfra Status</title><style>body{font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;max-width:1000px;margin:40px auto;padding:0 20px;line-height:1.6;color:#172033}h1{margin-bottom:6px}.muted,td span{color:#667085}code{background:#f3f4f6;padding:2px 6px;border-radius:5px}table{width:100%;border-collapse:collapse;margin-top:22px}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid #e5e7eb;font-size:14px}.box{background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;margin:18px 0}.ok{font-weight:700;color:#067647}@media(max-width:640px){th:nth-child(2),td:nth-child(2){display:none}}</style></head><body><h1>DM CourseInfra</h1><p class="muted">课程站点统一部署状态</p><div class="box"><div class="ok">当前页面来自一次成功发布</div><div>本页生成时间：<code>${generatedAt}</code></div><div>上一次记录的成功部署：<code>${previousState.lastSuccessfulDeployment || '首次部署'}</code></div><div>本次检测到变化：<code>${changedLabel}</code></div><div>部署策略：单通道串行；并发提交合并为最新待部署状态；每 30 分钟自动自愈检查。</div></div><p>Webhook：<code>/api/course-webhook</code> · JSON 状态：<code>/__infra/apps.json</code></p><table><thead><tr><th>项目</th><th>路径</th><th>当前版本</th><th>本次</th></tr></thead><tbody>${rows}</tbody></table></body></html>`);
 
 console.log(`\nDeploying assembled site to EdgeOne project ${registry.gateway.edgeoneProject}...`);
 await runProcess('edgeone', [
