@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "gatewayProject": "dm-course-gateway",
-  "lastSuccessfulDeployment": "2026-09-23T02:23:39.462Z",
+  "lastSuccessfulDeployment": "2026-09-23T02:31:22.954Z",
   "apps": {
     "DM001": {
       "repo": "PioneerX-DataMining/DM001-course-hub",
@@ -38,6 +38,12 @@
       "branch": "main",
       "sha": "3724ae05c4af8bb0e695ffa9b9ed9f1cdffb21a4",
       "mount": "/projects/dm015/"
+    },
+    "DM016": {
+      "repo": "PioneerX-DataMining/DM016-Word-Weaver",
+      "branch": "main",
+      "sha": "c8991c73cbc34c2f3eef9f0eb786634fdf261daf",
+      "mount": "/projects/dm016/"
     }
   }
 }
