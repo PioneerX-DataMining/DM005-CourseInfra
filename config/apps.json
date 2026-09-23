@@ -109,6 +109,23 @@
         "output": "."
       },
       "notes": "课程项目占位页；学生同步代码到 main 后由 CourseInfra 自动发布。"
+    },
+    {
+      "id": "DM016",
+      "name": "Word Weaver",
+      "slug": "dm016",
+      "repo": "PioneerX-DataMining/DM016-Word-Weaver",
+      "branch": "main",
+      "mount": "/projects/dm016/",
+      "publishEnabled": true,
+      "basePathReady": true,
+      "privateRepo": true,
+      "build": {
+        "install": "",
+        "command": "",
+        "output": "."
+      },
+      "notes": "课程项目占位页；学生同步代码到 main 后由 CourseInfra 自动发布。"
     }
   ]
 }
