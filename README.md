@@ -44,9 +44,23 @@ EdgeOne 不需要连接任何 GitHub 仓库，也不负责项目源码构建。�
 
 DM005 收到事件后仍会核对注册表中已发布项目的真实 commit；如果变化来自未发布项目，或发生重复 Webhook 投递，则不会重复部署。
 
-另保留每 6 小时一次的 reconciliation 检查作为兜底，防止某次 Webhook 丢失。`config/apps.json`、Webhook 函数或部署脚本自身更新时会立即强制部署，也可以从 Actions 手动运行。
+另保留每 30 分钟一次的 reconciliation 检查作为兜底，防止某次 Webhook 丢失或部署失败。`config/apps.json`、Webhook 函数或部署脚本自身更新时会立即强制部署，也可以从 Actions 手动运行。
 
 DM005 自己的 push 会被 Webhook 接收端忽略，避免 `state/deployments.json` 更新导致循环部署。
+
+### 并发与卡死策略
+
+CourseInfra 使用固定 concurrency group，并采用 `cancel-in-progress: false`：
+
+- 任意时刻只允许 1 个生产部署真正运行；
+- 当前部署运行期间出现多个仓库 push 时，GitHub Actions 只保留最新的 pending 任务；
+- 当前部署完成后，pending 任务会重新读取所有已注册仓库的最新 `main` SHA，因此中间提交无需逐个发布；
+- 不主动取消已经进入 EdgeOne 发布阶段的任务，避免 GitHub 取消而 EdgeOne 云端仍继续发布所造成的重叠部署；
+- 整个 deploy job 有 15 分钟总超时，EdgeOne 发布步骤有 12 分钟进程上限；
+- EdgeOne 发布命令不做自动重复 deploy。因为本地超时不代表远端部署已经停止，重复调用可能创建多个生产部署；
+- 每 30 分钟的 reconciliation 会检查 `state/deployments.json` 与各仓库最新 SHA；如果不一致，则自动补一次最新状态部署。
+
+因此设计目标不是“每个 commit 都上线”，而是“并发提交最终收敛到最新站点状态”。
 
 ## Secrets 与权限
 
@@ -135,4 +149,4 @@ edgeone makers deploy <assembled-site> \
 /__infra/apps.json
 ```
 
-用于查看当前上线的项目、路径和 commit，不包含任何 Secret。
+用于查看当前上线的项目、路径和 commit，不包含任何 Secret。状态页还会显示本次构建时间、上一次成功部署时间、本次发生变化的项目，以及当前的单通道部署策略。
