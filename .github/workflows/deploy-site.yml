@@ -19,7 +19,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: dm-course-central-deploy-v2
+  group: dm-course-central-deploy-v3
   cancel-in-progress: true
 
 jobs:
