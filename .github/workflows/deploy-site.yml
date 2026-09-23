@@ -9,6 +9,8 @@ on:
     branches: [main]
     paths:
       - 'config/apps.json'
+      - 'package.json'
+      - 'package-lock.json'
       - 'edge-functions/**'
       - 'scripts/deploy-site.mjs'
       - 'scripts/validate-registry.mjs'
