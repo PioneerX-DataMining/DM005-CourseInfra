@@ -2,14 +2,14 @@
   "schemaVersion": 2,
   "gatewayProject": "dm-course-gateway",
   "gatewayProjectId": "makers-ssul1zh8kx7t",
-  "lastSuccessfulDeployment": "2026-09-28T14:09:51.483Z",
-  "lastDeploymentId": "dpemmzqpdw6v",
+  "lastSuccessfulDeployment": "2026-09-28T14:10:57.899Z",
+  "lastDeploymentId": "dpzi5jbc68bu",
   "lastDeploymentStatus": "Success",
   "apps": {
     "DM001": {
       "repo": "PioneerX-DataMining/DM001-course-hub",
       "branch": "main",
-      "sha": "77dd3daff9ce3533a6a5ba14ec9cac55ddef5921",
+      "sha": "cb5b0d9ec942209330eb01ea3d89011b17ebc9b7",
       "mount": "/"
     },
     "DM011": {
