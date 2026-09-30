@@ -2,8 +2,8 @@
   "schemaVersion": 2,
   "gatewayProject": "dm-course-gateway",
   "gatewayProjectId": "makers-ssul1zh8kx7t",
-  "lastSuccessfulDeployment": "2026-09-30T03:15:14.021Z",
-  "lastDeploymentId": "dpbf2hm6ixct",
+  "lastSuccessfulDeployment": "2026-09-30T03:16:32.629Z",
+  "lastDeploymentId": "dppz8rzry552",
   "lastDeploymentStatus": "Success",
   "apps": {
     "DM001": {
