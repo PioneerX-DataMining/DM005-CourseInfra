@@ -2,8 +2,8 @@
   "schemaVersion": 2,
   "gatewayProject": "dm-course-gateway",
   "gatewayProjectId": "makers-ssul1zh8kx7t",
-  "lastSuccessfulDeployment": "2026-09-30T02:38:33.676Z",
-  "lastDeploymentId": "dp45cwygxsfw",
+  "lastSuccessfulDeployment": "2026-09-30T02:43:39.293Z",
+  "lastDeploymentId": "dpjv5otu1aj7",
   "lastDeploymentStatus": "Success",
   "apps": {
     "DM001": {
@@ -83,6 +83,12 @@
       "branch": "main",
       "sha": "377ee5778f0f3232425287ea7d2faaab6d3f6d99",
       "mount": "/projects/dm022/"
+    },
+    "DM023": {
+      "repo": "PioneerX-DataMining/DM023-TaskRemind",
+      "branch": "main",
+      "sha": "e80afd3b1de8168d8bfc2fcf5e67391a9d4df553",
+      "mount": "/projects/dm023/"
     }
   }
 }
