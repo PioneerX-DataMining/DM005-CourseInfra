@@ -2,8 +2,8 @@
   "schemaVersion": 2,
   "gatewayProject": "dm-course-gateway",
   "gatewayProjectId": "makers-ssul1zh8kx7t",
-  "lastSuccessfulDeployment": "2026-09-30T01:05:51.085Z",
-  "lastDeploymentId": "dp2dcq0pnzvr",
+  "lastSuccessfulDeployment": "2026-09-30T01:10:30.218Z",
+  "lastDeploymentId": "dpzehh2a9kqm",
   "lastDeploymentStatus": "Success",
   "apps": {
     "DM001": {
@@ -27,7 +27,7 @@
     "DM013": {
       "repo": "PioneerX-DataMining/DM013-BioChemLearn",
       "branch": "main",
-      "sha": "d262b810e6176489c65face26d9540f3bc0b676e",
+      "sha": "ad42c471afc08a3656d0c8ac6a29849577488b6d",
       "mount": "/projects/dm013/"
     },
     "DM014": {
