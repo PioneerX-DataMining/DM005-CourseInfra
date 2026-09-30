@@ -2,8 +2,8 @@
   "schemaVersion": 2,
   "gatewayProject": "dm-course-gateway",
   "gatewayProjectId": "makers-ssul1zh8kx7t",
-  "lastSuccessfulDeployment": "2026-09-30T02:22:13.239Z",
-  "lastDeploymentId": "dpsm8h8x4thk",
+  "lastSuccessfulDeployment": "2026-09-30T02:32:03.107Z",
+  "lastDeploymentId": "dpb0f4dlbfnw",
   "lastDeploymentStatus": "Success",
   "apps": {
     "DM001": {
@@ -45,7 +45,7 @@
     "DM016": {
       "repo": "PioneerX-DataMining/DM016-Word-Weaver",
       "branch": "main",
-      "sha": "a925180425068b02b822a5c9c1200723faf2ea54",
+      "sha": "34de4eb6ac8570af0275be0ab32a6f02b4b684fb",
       "mount": "/projects/dm016/"
     },
     "DM017": {
@@ -77,6 +77,12 @@
       "branch": "main",
       "sha": "b499a058c3e87a18f1942aabcaec82ae38fc1852",
       "mount": "/projects/dm021/"
+    },
+    "DM022": {
+      "repo": "PioneerX-DataMining/DM022-GameBox",
+      "branch": "main",
+      "sha": "377ee5778f0f3232425287ea7d2faaab6d3f6d99",
+      "mount": "/projects/dm022/"
     }
   }
 }
