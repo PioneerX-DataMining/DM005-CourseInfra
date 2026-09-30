@@ -246,6 +246,23 @@
         "output": "."
       },
       "notes": "课程项目占位页；学生同步代码到 main 后由 CourseInfra 自动发布。"
+    },
+    {
+      "id": "DM024",
+      "name": "Tally",
+      "slug": "dm024",
+      "repo": "PioneerX-DataMining/DM024-Tally",
+      "branch": "main",
+      "mount": "/projects/dm024/",
+      "publishEnabled": true,
+      "basePathReady": true,
+      "privateRepo": true,
+      "build": {
+        "install": "",
+        "command": "",
+        "output": "."
+      },
+      "notes": "记账工具测试页；学生同步代码到 main 后由 CourseInfra 自动发布。"
     }
   ]
 }
