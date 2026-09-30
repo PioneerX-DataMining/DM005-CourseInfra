@@ -2,8 +2,8 @@
   "schemaVersion": 2,
   "gatewayProject": "dm-course-gateway",
   "gatewayProjectId": "makers-ssul1zh8kx7t",
-  "lastSuccessfulDeployment": "2026-09-30T02:32:03.107Z",
-  "lastDeploymentId": "dpb0f4dlbfnw",
+  "lastSuccessfulDeployment": "2026-09-30T02:38:33.676Z",
+  "lastDeploymentId": "dp45cwygxsfw",
   "lastDeploymentStatus": "Success",
   "apps": {
     "DM001": {
@@ -45,7 +45,7 @@
     "DM016": {
       "repo": "PioneerX-DataMining/DM016-Word-Weaver",
       "branch": "main",
-      "sha": "34de4eb6ac8570af0275be0ab32a6f02b4b684fb",
+      "sha": "840cc8210e4e003bdec7ddef00fe3e0f80d5c4da",
       "mount": "/projects/dm016/"
     },
     "DM017": {
