@@ -81,4 +81,15 @@ jobs:
             const data=j.Data?.Response||j.Response||j;
             console.log('Custom domain API:',JSON.stringify({http:res.status,code:j.Code,message:j.Message,total:data.TotalCount,domains:(data.PagesDomains||data.Domains||[]).filter(d=>d.Domain==='dm.pioneer-x.cn').map(d=>({domain:d.Domain,status:d.Status,cname:d.Cname,currentCname:d.CurrentCname,mainDomain:d.MainDomain,area:d.Area,type:d.Type,zoneId:d.ZoneId}))}));
           }catch(e){console.log('Custom domain API error:',e.message);}
+
+          try {
+            const preview=await makers.deployments.wait({projectId,deploymentId:'dp0bsniau4lc',timeout:35,pollInterval:3});
+            if(preview.previewUrl){
+              const u=new URL(preview.previewUrl);
+              const response=await fetch(u,{signal:AbortSignal.timeout(9000)});
+              const body=await response.text();
+              console.log('Signed preview availability:',JSON.stringify({status:response.status,containsCourseHub:body.includes('DM001'),host:u.host,hasSignedQuery:u.searchParams.has('eo_token')}));
+              if(response.ok&&body.includes('DM001'))console.log('TEMPORARY_COURSE_PREVIEW_URL='+preview.previewUrl);
+            }
+          }catch(e){console.log('Signed preview error',e.message)}
           JS
