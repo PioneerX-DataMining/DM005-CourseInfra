@@ -46,12 +46,15 @@ function githubHeaders(app) {
   return headers;
 }
 
-async function latestSha(app) {
+async function latestCommit(app) {
   const url = `https://api.github.com/repos/${app.repo}/commits/${encodeURIComponent(app.branch)}`;
   const response = await fetch(url, { headers: githubHeaders(app), redirect: 'follow' });
   if (!response.ok) throw new Error(`${app.id}: unable to read ${app.repo}@${app.branch}: HTTP ${response.status}`);
   const data = await response.json();
-  return data.sha;
+  if (!data.sha || !data.commit?.committer?.date) {
+    throw new Error(`${app.id}: GitHub response missing latest commit or committer timestamp`);
+  }
+  return { sha: data.sha, committedAt: data.commit.committer.date };
 }
 
 async function downloadSource(app, destination) {
@@ -147,8 +150,11 @@ function liveStatusMatchesLatest(liveStatus, latest) {
 }
 
 const latest = {};
+const committedAt = {};
 for (const app of activeApps) {
-  latest[app.id] = await latestSha(app);
+  const commit = await latestCommit(app);
+  latest[app.id] = commit.sha;
+  committedAt[app.id] = commit.committedAt;
   console.log(`${app.id}: ${latest[app.id].slice(0, 12)} (${app.repo})`);
 }
 
@@ -273,6 +279,7 @@ const publicStatus = {
       repo: app.repo,
       mount: app.mount,
       revision: latest[app.id].slice(0, 12),
+      committedAt: committedAt[app.id],
       previousRevision: previousRevision ? previousRevision.slice(0, 12) : null,
       changed: previousRevision !== latest[app.id]
     };
