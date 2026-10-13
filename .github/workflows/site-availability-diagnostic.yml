@@ -63,4 +63,22 @@ jobs:
               }catch(e){console.log('Preview fetch error',v.deploymentId,e.message);}
             }
           }
+
+          try {
+            const project=await makers.projects.get({projectId});
+            console.log('Project domain info:',JSON.stringify({area:project.area,presetDomain:project.presetDomain,status:project.status}));
+            if(project.presetDomain){
+              try {
+                const domainUrl=new URL('https://'+project.presetDomain+'/');
+                const response=await fetch(domainUrl,{signal:AbortSignal.timeout(9000)});
+                console.log('Project domain HTTP',response.status,response.headers.get('server'));
+              }catch(e){console.log('Project domain error',e.message)}
+            }
+          }catch(e){console.log('Project get failed',e.message);}
+          try{
+            const res=await fetch('https://pages-api.cloud.tencent.com/v1',{method:'POST',headers:{'Authorization':'Bearer '+process.env.EDGEONE_API_TOKEN,'Content-Type':'application/json'},body:JSON.stringify({Action:'DescribePagesZoneCustomDomains',ProjectId:projectId}),signal:AbortSignal.timeout(12000)});
+            const j=await res.json();
+            const data=j.Data?.Response||j.Response||j;
+            console.log('Custom domain API:',JSON.stringify({http:res.status,code:j.Code,message:j.Message,total:data.TotalCount,domains:(data.PagesDomains||data.Domains||[]).filter(d=>d.Domain==='dm.pioneer-x.cn').map(d=>({domain:d.Domain,status:d.Status,cname:d.Cname,currentCname:d.CurrentCname,mainDomain:d.MainDomain,area:d.Area,type:d.Type,zoneId:d.ZoneId}))}));
+          }catch(e){console.log('Custom domain API error:',e.message);}
           JS
