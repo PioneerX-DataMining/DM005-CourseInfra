@@ -1,0 +1,31 @@
+name: Course site availability diagnostic
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/site-availability-diagnostic.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Resolve course-site DNS
+        shell: bash
+        run: |
+          echo "=== system resolution ==="
+          getent ahostsv4 dm.pioneer-x.cn || true
+          echo "=== Cloudflare resolver ==="
+          dig +time=3 +tries=1 @1.1.1.1 dm.pioneer-x.cn A || true
+          echo "=== Google resolver ==="
+          dig +time=3 +tries=1 @8.8.8.8 dm.pioneer-x.cn A || true
+      - name: Probe pages and report HTTP status
+        shell: bash
+        run: |
+          for path in / /curriculum.html /concepts/feature-scaling.html /__infra/apps.json /api/course-webhook; do
+            echo "=== https://dm.pioneer-x.cn$path ==="
+            curl -L -sS --connect-timeout 6 --max-time 12 -o /tmp/course-http-body -D /tmp/course-http-headers -w 'HTTP=%{http_code} DNS=%{time_namelookup} connect=%{time_connect} TLS=%{time_appconnect} total=%{time_total} IP=%{remote_ip}\n' "https://dm.pioneer-x.cn$path?diag=${GITHUB_RUN_ID}" || true
+            head -n 12 /tmp/course-http-headers 2>/dev/null || true
+            head -c 200 /tmp/course-http-body 2>/dev/null | tr '\n' ' '; echo
+          done
