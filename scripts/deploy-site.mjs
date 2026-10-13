@@ -51,8 +51,8 @@ async function latestCommit(app) {
   const response = await fetch(url, { headers: githubHeaders(app), redirect: 'follow' });
   if (!response.ok) throw new Error(`${app.id}: unable to read ${app.repo}@${app.branch}: HTTP ${response.status}`);
   const data = await response.json();
-  if (!data.sha || !data.commit?.committer?.date) {
-    throw new Error(`${app.id}: GitHub response missing latest commit or committer timestamp`);
+  if (!data.sha || !Number.isFinite(Date.parse(data.commit?.committer?.date))) {
+    throw new Error(`${app.id}: GitHub response missing latest commit or valid committer timestamp`);
   }
   return { sha: data.sha, committedAt: data.commit.committer.date };
 }
