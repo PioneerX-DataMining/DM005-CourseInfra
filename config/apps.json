@@ -348,6 +348,23 @@
         "output": "."
       },
       "notes": "智能课程规划助手占位页；学生同步代码到 main 后由 CourseInfra 自动发布。"
+    },
+    {
+      "id": "DM030",
+      "name": "KaoyanHub",
+      "slug": "dm030",
+      "repo": "PioneerX-DataMining/DM030-KaoyanHub",
+      "branch": "main",
+      "mount": "/projects/dm030/",
+      "publishEnabled": true,
+      "basePathReady": true,
+      "privateRepo": true,
+      "build": {
+        "install": "",
+        "command": "",
+        "output": "."
+      },
+      "notes": "考研学习平台课程项目占位页；学生同步代码到 main 后由 CourseInfra 自动发布。"
     }
   ]
 }
