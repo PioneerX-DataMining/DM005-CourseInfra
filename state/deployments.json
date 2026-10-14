@@ -2,8 +2,8 @@
   "schemaVersion": 2,
   "gatewayProject": "dm-course-gateway",
   "gatewayProjectId": "makers-ssul1zh8kx7t",
-  "lastSuccessfulDeployment": "2026-10-14T02:10:59.742Z",
-  "lastDeploymentId": "dp6tr4ckadbd",
+  "lastSuccessfulDeployment": "2026-10-14T02:13:14.457Z",
+  "lastDeploymentId": "dplrdbxbqtwy",
   "lastDeploymentStatus": "Success",
   "apps": {
     "DM001": {
@@ -99,7 +99,7 @@
     "DM025": {
       "repo": "PioneerX-DataMining/DM025-Mindful-Nest",
       "branch": "main",
-      "sha": "f750300b6bcca32ae0eb2b2fd137e12a35298e14",
+      "sha": "908c5eb1c17922dc30f9a4041dbe433ba7229b9f",
       "mount": "/projects/dm025/"
     },
     "DM026": {
