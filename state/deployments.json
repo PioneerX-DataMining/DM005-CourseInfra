@@ -2,8 +2,8 @@
   "schemaVersion": 2,
   "gatewayProject": "dm-course-gateway",
   "gatewayProjectId": "makers-ssul1zh8kx7t",
-  "lastSuccessfulDeployment": "2026-10-14T01:46:04.433Z",
-  "lastDeploymentId": "dp178xp6mt4q",
+  "lastSuccessfulDeployment": "2026-10-14T01:56:22.367Z",
+  "lastDeploymentId": "dppbi6traeg7",
   "lastDeploymentStatus": "Success",
   "apps": {
     "DM001": {
@@ -51,7 +51,7 @@
     "DM017": {
       "repo": "PioneerX-DataMining/DM017-DreamComeTrue",
       "branch": "main",
-      "sha": "d2da4ad36e4fa0bb5e9c53a4c0dd88a4f2ca5fd2",
+      "sha": "3f29a10132c85435c455f297c7bfc9a8879a5e34",
       "mount": "/projects/dm017/"
     },
     "DM018": {
