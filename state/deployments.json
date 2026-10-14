@@ -2,8 +2,8 @@
   "schemaVersion": 2,
   "gatewayProject": "dm-course-gateway",
   "gatewayProjectId": "makers-ssul1zh8kx7t",
-  "lastSuccessfulDeployment": "2026-10-14T02:27:30.148Z",
-  "lastDeploymentId": "dptlshpo2v1s",
+  "lastSuccessfulDeployment": "2026-10-14T02:34:00.274Z",
+  "lastDeploymentId": "dprlszok5f2s",
   "lastDeploymentStatus": "Success",
   "apps": {
     "DM001": {
@@ -111,7 +111,7 @@
     "DM027": {
       "repo": "PioneerX-DataMining/DM027-Aimlab",
       "branch": "main",
-      "sha": "b22e4313be3f5b10749d2b63544b1a47c8c1bcaf",
+      "sha": "4c3e9d98e2c1c03d5e55479b0ad40e4e684a38ba",
       "mount": "/projects/dm027/"
     },
     "DM028": {
