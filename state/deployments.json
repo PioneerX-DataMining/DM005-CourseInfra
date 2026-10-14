@@ -2,8 +2,8 @@
   "schemaVersion": 2,
   "gatewayProject": "dm-course-gateway",
   "gatewayProjectId": "makers-ssul1zh8kx7t",
-  "lastSuccessfulDeployment": "2026-10-14T02:14:42.950Z",
-  "lastDeploymentId": "dpfanuut18ak",
+  "lastSuccessfulDeployment": "2026-10-14T02:20:39.615Z",
+  "lastDeploymentId": "dpivkupgr4zz",
   "lastDeploymentStatus": "Success",
   "apps": {
     "DM001": {
@@ -33,7 +33,7 @@
     "DM014": {
       "repo": "PioneerX-DataMining/DM014-Smile-Elf",
       "branch": "main",
-      "sha": "2ef8b32f4fc35d2160586300407a00352ea8c3c0",
+      "sha": "e5f7157b060432576d8c9ced281a142fcc0a1ef5",
       "mount": "/projects/dm014/"
     },
     "DM015": {
