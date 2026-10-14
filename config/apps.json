@@ -331,6 +331,23 @@
         "output": "."
       },
       "notes": "主客体构象搜索与结构优化课程项目占位页；学生同步代码到 main 后由 CourseInfra 自动发布。"
+    },
+    {
+      "id": "DM029",
+      "name": "Smart Course Planner",
+      "slug": "dm029",
+      "repo": "PioneerX-DataMining/DM029-Smart-Course-Planner",
+      "branch": "main",
+      "mount": "/projects/dm029/",
+      "publishEnabled": true,
+      "basePathReady": true,
+      "privateRepo": true,
+      "build": {
+        "install": "",
+        "command": "",
+        "output": "."
+      },
+      "notes": "智能课程规划助手占位页；学生同步代码到 main 后由 CourseInfra 自动发布。"
     }
   ]
 }
