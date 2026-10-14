@@ -2,8 +2,8 @@
   "schemaVersion": 2,
   "gatewayProject": "dm-course-gateway",
   "gatewayProjectId": "makers-ssul1zh8kx7t",
-  "lastSuccessfulDeployment": "2026-10-14T05:57:38.114Z",
-  "lastDeploymentId": "dp9ue6g6n9ms",
+  "lastSuccessfulDeployment": "2026-10-14T06:02:10.288Z",
+  "lastDeploymentId": "dpzy67d70u90",
   "lastDeploymentStatus": "Success",
   "apps": {
     "DM001": {
@@ -21,7 +21,7 @@
     "DM012": {
       "repo": "PioneerX-DataMining/DM012-Calorie-Calculator",
       "branch": "main",
-      "sha": "04541590c6ae782eb8deaa629a3655f557bfdbd9",
+      "sha": "7661fbaaf405485c5ffe2a26811329aa2d2a07c0",
       "mount": "/projects/dm012/"
     },
     "DM013": {
