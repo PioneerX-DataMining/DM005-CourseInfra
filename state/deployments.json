@@ -2,8 +2,8 @@
   "schemaVersion": 2,
   "gatewayProject": "dm-course-gateway",
   "gatewayProjectId": "makers-ssul1zh8kx7t",
-  "lastSuccessfulDeployment": "2026-10-17T11:41:45.405Z",
-  "lastDeploymentId": "dpe10c7xsmpy",
+  "lastSuccessfulDeployment": "2026-10-17T12:10:53.744Z",
+  "lastDeploymentId": "dpzps5xrvyvk",
   "lastDeploymentStatus": "Success",
   "apps": {
     "DM001": {
@@ -105,7 +105,7 @@
     "DM026": {
       "repo": "PioneerX-DataMining/DM026-ScoreConverter",
       "branch": "main",
-      "sha": "87c2ffc7a20b7f5d82b1e0b1a1d1503d8319f0cc",
+      "sha": "478dbce68e2c5e51cc739ecaafd89eb501ba4f8f",
       "mount": "/projects/dm026/"
     },
     "DM027": {
