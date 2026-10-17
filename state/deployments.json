@@ -2,8 +2,8 @@
   "schemaVersion": 2,
   "gatewayProject": "dm-course-gateway",
   "gatewayProjectId": "makers-ssul1zh8kx7t",
-  "lastSuccessfulDeployment": "2026-10-17T05:20:41.527Z",
-  "lastDeploymentId": "dpjohti96t7m",
+  "lastSuccessfulDeployment": "2026-10-17T06:54:13.251Z",
+  "lastDeploymentId": "dp39m874np2g",
   "lastDeploymentStatus": "Success",
   "apps": {
     "DM001": {
@@ -123,7 +123,7 @@
     "DM029": {
       "repo": "PioneerX-DataMining/DM029-Smart-Course-Planner",
       "branch": "main",
-      "sha": "9d4f6f002b0b24de818b6dbe9babb2a8d854c833",
+      "sha": "555ba92691a6b3473f0f15589c9114688fc10467",
       "mount": "/projects/dm029/"
     },
     "DM030": {
