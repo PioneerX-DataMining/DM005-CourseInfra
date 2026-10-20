@@ -1,5 +1,5 @@
 name: Course site availability diagnostic
-# On-demand probe for 2026-10-13 evening site availability; does not deploy or change DNS.
+# On-demand diagnostic (including 2026-10-20 site outage); does not deploy or change DNS.
 on:
   push:
     branches: [main]
