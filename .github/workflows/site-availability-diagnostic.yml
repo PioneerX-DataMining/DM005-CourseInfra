@@ -94,3 +94,29 @@ jobs:
             }
           }catch(e){console.log('Signed preview error',e.message)}
           JS
+
+      - name: Identify healthy deployment preview and production routing discrepancy
+        shell: bash
+        env:
+          EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_API_TOKEN }}
+        run: |
+          node --input-type=module <<'JS'
+          import { Makers } from '@edgeone/makers-sdk';
+          const makers = new Makers({token:process.env.EDGEONE_API_TOKEN,region:'china',timeout:15,retries:1});
+          const projectId='makers-ssul1zh8kx7t';
+          const listed=await makers.deployments.list({projectId,page:0,pageSize:5,order:{field:'createdOn',direction:'desc'}});
+          const newest=listed.items.find(x=>x.env==='Production'&&x.status==='Success');
+          if(!newest)throw new Error('No recent successful production deployment');
+          console.log('Most recent successful production deployment ID:',newest.deploymentId);
+          const details=await makers.deployments.wait({projectId,deploymentId:newest.deploymentId,timeout:45,pollInterval:3});
+          const base=details.previewUrl;
+          if(!base)throw new Error('Unable to get valid deployment preview URL');
+          console.log('Temporary preview url available:',base);
+          for(const route of ['/','/curriculum.html','/concepts/hierarchical-clustering.html','/api/course-webhook']){
+            const uri=new URL(base);uri.pathname=route;
+            try{
+              const res=await fetch(uri,{redirect:'manual',signal:AbortSignal.timeout(9000)});
+              console.log('PREVIEW_PROBE '+route+' HTTP='+res.status+' content-type='+res.headers.get('content-type'));
+            }catch(e){console.log('PREVIEW_PROBE '+route+' ERROR='+e.message);}
+          }
+          JS
