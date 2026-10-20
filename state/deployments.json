@@ -2,8 +2,8 @@
   "schemaVersion": 2,
   "gatewayProject": "dm-course-gateway",
   "gatewayProjectId": "makers-ssul1zh8kx7t",
-  "lastSuccessfulDeployment": "2026-10-20T14:27:20.130Z",
-  "lastDeploymentId": "dplz5sgkk9zj",
+  "lastSuccessfulDeployment": "2026-10-20T15:52:23.228Z",
+  "lastDeploymentId": "dpfy4y5pkqyc",
   "lastDeploymentStatus": "Success",
   "apps": {
     "DM001": {
@@ -81,7 +81,7 @@
     "DM022": {
       "repo": "PioneerX-DataMining/DM022-GameBox",
       "branch": "main",
-      "sha": "7bcaadb9df7773877ab8a739db07214a60432fae",
+      "sha": "0af9968473ce4926001666e222a41f1fc3b231b7",
       "mount": "/projects/dm022/"
     },
     "DM023": {
