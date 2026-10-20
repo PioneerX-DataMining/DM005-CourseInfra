@@ -2,8 +2,8 @@
   "schemaVersion": 2,
   "gatewayProject": "dm-course-gateway",
   "gatewayProjectId": "makers-ssul1zh8kx7t",
-  "lastSuccessfulDeployment": "2026-10-20T03:23:13.459Z",
-  "lastDeploymentId": "dpfjv968dpyn",
+  "lastSuccessfulDeployment": "2026-10-20T03:32:14.494Z",
+  "lastDeploymentId": "dpfxrxzz8qld",
   "lastDeploymentStatus": "Success",
   "apps": {
     "DM001": {
@@ -93,7 +93,7 @@
     "DM024": {
       "repo": "PioneerX-DataMining/DM024-Tally",
       "branch": "main",
-      "sha": "ec1689b739bb4693ab0471a2530139d6ce478527",
+      "sha": "1cbcdeb285eb33877507255a0f9fa8013f04455d",
       "mount": "/projects/dm024/"
     },
     "DM025": {
