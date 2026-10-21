@@ -2,8 +2,8 @@
   "schemaVersion": 2,
   "gatewayProject": "dm-course-gateway",
   "gatewayProjectId": "makers-ssul1zh8kx7t",
-  "lastSuccessfulDeployment": "2026-10-21T02:21:39.600Z",
-  "lastDeploymentId": "dpavneg3t2ir",
+  "lastSuccessfulDeployment": "2026-10-21T02:28:29.281Z",
+  "lastDeploymentId": "dpe7uvt2u153",
   "lastDeploymentStatus": "Success",
   "apps": {
     "DM001": {
@@ -75,7 +75,7 @@
     "DM021": {
       "repo": "PioneerX-DataMining/DM021-GlycoMine",
       "branch": "main",
-      "sha": "d73128d5df9203bb6086696f1178526c0f3ad8bd",
+      "sha": "9b69be94b5ee32ccd3c51d579e30ead01549c7d1",
       "mount": "/projects/dm021/"
     },
     "DM022": {
