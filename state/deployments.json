@@ -2,8 +2,8 @@
   "schemaVersion": 2,
   "gatewayProject": "dm-course-gateway",
   "gatewayProjectId": "makers-ssul1zh8kx7t",
-  "lastSuccessfulDeployment": "2026-10-20T16:01:44.042Z",
-  "lastDeploymentId": "dp4ptjcq62zk",
+  "lastSuccessfulDeployment": "2026-10-21T01:25:40.550Z",
+  "lastDeploymentId": "dphanyzg54fa",
   "lastDeploymentStatus": "Success",
   "apps": {
     "DM001": {
@@ -63,7 +63,7 @@
     "DM019": {
       "repo": "PioneerX-DataMining/DM019-Trip-Planner",
       "branch": "main",
-      "sha": "7c0ee77988ab858120ec4aef58fb9e7d91b4068f",
+      "sha": "5c41ae3d8a484a72fc0fb4569975aee4ab55f092",
       "mount": "/projects/dm019/"
     },
     "DM020": {
