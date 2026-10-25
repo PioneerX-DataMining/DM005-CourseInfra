@@ -2,8 +2,8 @@
   "schemaVersion": 2,
   "gatewayProject": "dm-course-gateway",
   "gatewayProjectId": "makers-ssul1zh8kx7t",
-  "lastSuccessfulDeployment": "2026-10-25T12:37:34.932Z",
-  "lastDeploymentId": "dp5zxybdvebv",
+  "lastSuccessfulDeployment": "2026-10-25T12:40:44.571Z",
+  "lastDeploymentId": "dpev3ysc60q1",
   "lastDeploymentStatus": "Success",
   "apps": {
     "DM001": {
@@ -57,7 +57,7 @@
     "DM018": {
       "repo": "PioneerX-DataMining/DM018-Micro-World",
       "branch": "main",
-      "sha": "fa791ab057044c792e7eb2baa7edcdd67f21ad45",
+      "sha": "6ed77b79b535f4ccd2c9c76ba5d8ac633cf0eb67",
       "mount": "/projects/dm018/"
     },
     "DM019": {
