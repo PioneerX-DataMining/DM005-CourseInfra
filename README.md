@@ -148,6 +148,8 @@ node scripts/test-check-project-pages.mjs
 
 只要有任一项不是 `READY`，脚本即以非 0 退出。它**只读**，不改注册表、不部署、不碰学生仓库。
 
+`STALE_DEPLOY` 比的是**当前工作区**里的 `state/deployments.json`，所以在过期的 checkout 里运行会把刚部署完的项目误报成滞后——跑之前先 `git switch main && git pull`。实测对照：同一个脚本在落后 3 个提交的树上把 DM016 报成 `STALE_DEPLOY`，同步到最新 main 后 21/21 全为 `READY`。
+
 ## EdgeOne
 
 整个课程网站只需要一个 EdgeOne Makers Project：`dm-course-gateway`。CourseInfra 使用官方 `@edgeone/makers-sdk` 发布已经组装好的完整站点目录，并固定使用该项目的 `projectId`。
