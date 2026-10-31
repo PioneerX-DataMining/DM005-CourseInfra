@@ -21,6 +21,7 @@ export const REASON = {
   NO_ROOT_INDEX: 'NO_ROOT_INDEX',
   STALE_DEPLOY: 'STALE_DEPLOY',
   FALLBACK_PAGE: 'FALLBACK_PAGE',
+  NO_CUSTOM_DOMAIN: 'NO_CUSTOM_DOMAIN',
   HTTP_ERROR: 'HTTP_ERROR'
 };
 
@@ -96,6 +97,25 @@ export function pageUrl(customDomain, mount) {
 }
 
 /**
+ * Read the hub body that the fallback detector depends on.
+ *
+ * The detector compares every project response against the hub page, so a hub
+ * body that is an error page or an empty document makes every comparison fail
+ * open: nothing would ever look like the fallback. The callers must therefore
+ * treat an unusable hub body as a hard error instead of continuing.
+ */
+export function hubBodyFromResponse(response, body) {
+  if (!response || response.ok !== true) {
+    const reason = response ? `HTTP ${response.status}` : 'no response';
+    return { error: `cannot read the course hub page (${reason}); the fallback check would silently pass` };
+  }
+  if (body == null || String(body).trim() === '') {
+    return { error: 'the course hub page body is empty; the fallback check would silently pass' };
+  }
+  return { hubBody: body };
+}
+
+/**
  * Run both checks for every registry app.
  *
  * @param {object} options
@@ -118,7 +138,15 @@ export async function checkProjectPages({ registry, state, readRepo, probe, hubB
     }
     const source = classifySource(app, { state, repo });
     let served = null;
-    if (probe && domain) {
+    if (probe && !domain) {
+      // Requested a served-side check but the registry has no domain to build a
+      // URL from. Reporting READY here would hide every project behind a check
+      // that never ran, so the missing input is surfaced as its own finding.
+      served = {
+        code: REASON.NO_CUSTOM_DOMAIN,
+        detail: 'gateway.customDomain is missing from the registry, so no page was probed'
+      };
+    } else if (probe) {
       const url = pageUrl(domain, app.mount);
       try {
         const response = await probe(url);
@@ -171,18 +199,18 @@ export function formatReport(results) {
   return lines.join('\n');
 }
 
-async function githubRootEntries(repo, branch, token) {
+async function githubRootEntries(repo, branch, token, fetchImpl = fetch) {
   const headers = {
     accept: 'application/vnd.github+json',
     'user-agent': 'dm005-courseinfra-diagnose',
     authorization: `Bearer ${token}`
   };
-  const commitResponse = await fetch(`https://api.github.com/repos/${repo}/commits/${branch}`, { headers });
+  const commitResponse = await fetchImpl(`https://api.github.com/repos/${repo}/commits/${branch}`, { headers });
   if (!commitResponse.ok) {
     return { error: `HTTP ${commitResponse.status} reading commits/${branch}` };
   }
   const commit = await commitResponse.json();
-  const treeResponse = await fetch(`https://api.github.com/repos/${repo}/git/trees/${commit.sha}`, { headers });
+  const treeResponse = await fetchImpl(`https://api.github.com/repos/${repo}/git/trees/${commit.sha}`, { headers });
   if (!treeResponse.ok) {
     return { sha: commit.sha, error: `HTTP ${treeResponse.status} reading tree` };
   }
@@ -190,30 +218,63 @@ async function githubRootEntries(repo, branch, token) {
   return { sha: commit.sha, rootEntries: (tree.tree || []).map((entry) => entry.path) };
 }
 
-async function main() {
-  const token = process.env.COURSEINFRA_REPO_TOKEN || process.env.GITHUB_TOKEN;
+/**
+ * Command-line body, kept separate from `main()` so the wiring itself (hub guard
+ * included) can be asserted offline instead of only by running the real site.
+ *
+ * @returns {Promise<number>} process exit code: 0 all READY, 1 findings, 2 cannot diagnose
+ */
+export async function runCli({
+  token = process.env.COURSEINFRA_REPO_TOKEN || process.env.GITHUB_TOKEN,
+  fetchImpl = fetch,
+  log = (line) => console.log(line),
+  logError = (line) => console.error(line),
+  registry,
+  state
+} = {}) {
   if (!token) {
-    console.error('COURSEINFRA_REPO_TOKEN or GITHUB_TOKEN is required for source checks.');
-    process.exit(2);
+    logError('COURSEINFRA_REPO_TOKEN or GITHUB_TOKEN is required for source checks.');
+    return 2;
   }
-  const registry = JSON.parse(await readFile(REGISTRY_PATH, 'utf8'));
-  const state = JSON.parse(await readFile(STATE_PATH, 'utf8'));
-  const hubUrl = pageUrl(registry.gateway.customDomain, '/');
-  const hubResponse = await fetch(hubUrl, { headers: { 'cache-control': 'no-cache' } });
-  const hubBody = await hubResponse.text();
+  const reg = registry ?? JSON.parse(await readFile(REGISTRY_PATH, 'utf8'));
+  const st = state ?? JSON.parse(await readFile(STATE_PATH, 'utf8'));
+  const domain = reg?.gateway?.customDomain;
+  if (!domain) {
+    logError('config/apps.json has no gateway.customDomain: the served-side check cannot run.');
+    return 2;
+  }
+  const hubUrl = pageUrl(domain, '/');
+  let hubResponse;
+  let hubText;
+  try {
+    hubResponse = await fetchImpl(hubUrl, { headers: { 'cache-control': 'no-cache' } });
+    hubText = await hubResponse.text();
+  } catch (error) {
+    logError(`cannot reach the course hub page ${hubUrl}: ${error?.message || String(error)}`);
+    return 2;
+  }
+  const hub = hubBodyFromResponse(hubResponse, hubText);
+  if (hub.error) {
+    logError(`${hub.error} (${hubUrl})`);
+    return 2;
+  }
   const results = await checkProjectPages({
-    registry,
-    state,
-    hubBody,
-    readRepo: (app) => githubRootEntries(app.repo, app.branch, token),
+    registry: reg,
+    state: st,
+    hubBody: hub.hubBody,
+    readRepo: (app) => githubRootEntries(app.repo, app.branch, token, fetchImpl),
     probe: async (url) => {
-      const response = await fetch(url, { headers: { 'cache-control': 'no-cache' } });
+      const response = await fetchImpl(url, { headers: { 'cache-control': 'no-cache' } });
       return { status: response.status, body: await response.text() };
     }
   });
-  console.log(formatReport(results));
+  log(formatReport(results));
   const { ok, total } = summarize(results);
-  process.exit(ok === total ? 0 : 1);
+  return ok === total ? 0 : 1;
+}
+
+async function main() {
+  process.exit(await runCli());
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
