@@ -124,6 +124,32 @@ Active: enabled
 
 Vite / React / Vue 项目应配置对应的生产 base，例如 DM011 使用 `/projects/dm011/`。不要直接使用 `/styles.css`、`/assets/app.js` 这类从域名根目录开始的资源路径。
 
+## 项目页排障：学生说「改了但页面没变」
+
+课程网关对任何**未匹配的路径**都会回落到课程首页，并且状态码仍是 `200`，所以「打开 `/projects/dmNNN/` 看到 200」不能证明项目页已经发布。`scripts/check-project-pages.mjs` 把两侧一起判定：
+
+```bash
+# 源侧 + 生产侧（需要能读各项目仓库的 token；不写 token 时只做源侧会直接退出）
+COURSEINFRA_REPO_TOKEN=<token> node scripts/check-project-pages.mjs
+
+# 脚本自身的断言（16 组，不联网）
+node scripts/test-check-project-pages.mjs
+```
+
+判定码的含义：
+
+- `READY`：注册表、仓库根 `index.html`、已记录部署 revision 与线上字节互不矛盾；
+- `DISABLED` / `NOT_IN_STATE` / `MISSING_REPO`：`publishEnabled` 未开、没有部署记录、读不到仓库；
+- `NO_ROOT_INDEX`：仓库根目录没有 `index.html`，挂载点必然回落首页；
+- `STALE_DEPLOY`：各项目 `main` 已前进，但 `state/deployments.json` 还是旧 revision；
+- `FALLBACK_PAGE`：返回字节与课程首页完全相同 —— 看到的是回落页，不是项目；
+- `NO_CUSTOM_DOMAIN`：注册表缺 `gateway.customDomain`，生产侧根本没探测；
+- `HTTP_ERROR`：非 200 或探测失败。
+
+只要有任一项不是 `READY`，脚本即以非 0 退出。它**只读**，不改注册表、不部署、不碰学生仓库。
+
+`STALE_DEPLOY` 比的是**当前工作区**里的 `state/deployments.json`，所以在过期的 checkout 里运行会把刚部署完的项目误报成滞后——跑之前先 `git switch main && git pull`。实测对照：同一个脚本在落后 3 个提交的树上把 DM016 报成 `STALE_DEPLOY`，同步到最新 main 后 21/21 全为 `READY`。
+
 ## EdgeOne
 
 整个课程网站只需要一个 EdgeOne Makers Project：`dm-course-gateway`。CourseInfra 使用官方 `@edgeone/makers-sdk` 发布已经组装好的完整站点目录，并固定使用该项目的 `projectId`。
