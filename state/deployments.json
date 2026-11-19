@@ -2,8 +2,8 @@
   "schemaVersion": 2,
   "gatewayProject": "dm-course-gateway",
   "gatewayProjectId": "makers-ssul1zh8kx7t",
-  "lastSuccessfulDeployment": "2026-11-18T13:42:45.522Z",
-  "lastDeploymentId": "dpgpei9304sa",
+  "lastSuccessfulDeployment": "2026-11-19T06:51:40.894Z",
+  "lastDeploymentId": "dpsx3e4vtim0",
   "lastDeploymentStatus": "Success",
   "apps": {
     "DM001": {
@@ -117,7 +117,7 @@
     "DM028": {
       "repo": "PioneerX-DataMining/DM028-HostGuestCompute",
       "branch": "main",
-      "sha": "cc8792c875d37df39666597891484fa20b4f387b",
+      "sha": "315a75388cee1d6d2390168b1bc642effe18afc2",
       "mount": "/projects/dm028/"
     },
     "DM029": {
