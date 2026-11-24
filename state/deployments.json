@@ -2,8 +2,8 @@
   "schemaVersion": 2,
   "gatewayProject": "dm-course-gateway",
   "gatewayProjectId": "makers-ssul1zh8kx7t",
-  "lastSuccessfulDeployment": "2026-11-24T15:00:30.094Z",
-  "lastDeploymentId": "dp0znr8qrx0u",
+  "lastSuccessfulDeployment": "2026-11-24T15:03:08.690Z",
+  "lastDeploymentId": "dp74jsascjwl",
   "lastDeploymentStatus": "Success",
   "apps": {
     "DM001": {
@@ -69,7 +69,7 @@
     "DM020": {
       "repo": "PioneerX-DataMining/DM020-Magic-Wardrobe",
       "branch": "main",
-      "sha": "6f6aee1f97b0da38a0c197e80cc4093e3e74d85f",
+      "sha": "6c8a456071c2eb5973d17829e2a94cb05e08a1cb",
       "mount": "/projects/dm020/"
     },
     "DM021": {
