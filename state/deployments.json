@@ -2,8 +2,8 @@
   "schemaVersion": 2,
   "gatewayProject": "dm-course-gateway",
   "gatewayProjectId": "makers-ssul1zh8kx7t",
-  "lastSuccessfulDeployment": "2026-11-25T02:23:50.735Z",
-  "lastDeploymentId": "dporreie7eyu",
+  "lastSuccessfulDeployment": "2026-11-25T02:53:07.567Z",
+  "lastDeploymentId": "dpl786yoqr5i",
   "lastDeploymentStatus": "Success",
   "apps": {
     "DM001": {
@@ -15,7 +15,7 @@
     "DM011": {
       "repo": "PioneerX-DataMining/DM011-Canteen-Commons",
       "branch": "main",
-      "sha": "0554928c9e57d18026932283e82397944670d2f2",
+      "sha": "c38cabcc2166f308337d151d61cf91baabbc57b2",
       "mount": "/projects/dm011/"
     },
     "DM012": {
